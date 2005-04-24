@@ -2,7 +2,7 @@
 -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-13
 !#
 
-;;; $Id:$
+;;; $Id: program-spider.scm,v 1.2 2005/04/23 23:52:42 friedel Exp friedel $
 
 ;;;srfi-1: list library
 ;;;srfi-13: string operations
@@ -103,6 +103,18 @@
         (failthunk)
         (successcalc val))))
 
+(define-syntax with-success-or-fail
+  (syntax-rules ()
+    ((with-success-or-fail expr successcalc failexpr)
+     (call+calc-or-fail (lambda () expr)
+                        successcalc
+                        (lambda () failexpr)))))
+
+(define-syntax do-or-f
+  (syntax-rules ()
+    ((do-or-f . body)
+     (with-success-or-fail (begin . body) (lambda (x) x) #f))))
+
 (define (faktabox tree)
   (elements-between (lambda (x)
                       (comment-match x faktboxstart))
@@ -134,7 +146,7 @@
 
 (define (url-name-country rest collected)
   (if (null? rest)
-      collected
+      (reverse collected)
       (let* ((el (car rest))
              (newel
               (with-success-or-fail
@@ -156,7 +168,7 @@
 
 (define (short-description rest collected passover)
   (if (null? rest)
-      collected
+      (reverse collected)
       (let* ((el (car rest))
              (newel (do-or-f
                      (let ((strlist
@@ -180,44 +192,12 @@
                                collected
                                passover)))))
 
-(define (band-url-name-country-shortdesc-list tree)
+(define (spider-bandlist tree)
   (url-name-country tree '()))
 
-(define (band-url-name-country-shortdesc-list-old tree)
-  (filter-map
-   (lambda (x)
-     (with-success-or-fail
-      (find-branch-address bandname x)
-      (lambda (x)
-        (do-or-f
-         (cons (second (find-branch-address bandinfourl
-                                            x))
-               (let ((y (split-parens (third x))))
-                 (list (string-trim-both (car y))
-                       (split-slash (second y)))))))
-      (do-or-f
-       (let ((strlist (filter string?
-                              (drop (find-branch-address shortdesc
-                                                         x)
-                                    2))))
-         (if (not (null? strlist))
-             (reduce string-append
-                     ""
-                     strlist)
-             #f)))))
-   tree))
+(define (get-bandlist)
+  (spider-bandlist (bandlist-table (url-body topurl))))
 
-(define-syntax with-success-or-fail
-  (syntax-rules ()
-    ((with-success-or-fail body successcalc failbody)
-     (call+calc-or-fail (lambda () body)
-                        successcalc
-                        (lambda () failbody)))))
-
-(define-syntax do-or-f
-  (syntax-rules ()
-    ((do-or-f body)
-     (with-success-or-fail body (lambda (x) x) #f))))
 
 ;;; just for debugging convenience, I could use format, but I don't wanna!
 (define (display-list lst)
@@ -229,4 +209,7 @@
 
 ;;(display-list (get-first-level))
 
-;;; $Log:$
+;;; $Log: program-spider.scm,v $
+;;; Revision 1.2  2005/04/23 23:52:42  friedel
+;;; Program is correctly parsed into a list of lists :-}
+;;;
