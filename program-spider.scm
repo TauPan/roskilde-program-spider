@@ -3,7 +3,7 @@ IFS=" "
 exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-13 -o srfi-28 -o threads "$0" "$@"
 !#
 
-;;; $Id: program-spider.scm,v 1.3 2005/04/24 01:23:22 friedel Exp friedel $
+;;; $Id: program-spider.scm,v 1.4 2006/01/27 19:00:16 friedel Exp friedel $
 
 ;;;srfi-1: list library
 ;;;srfi-13: string operations
@@ -12,9 +12,9 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 ;;;conditions: condition checking
 ;;;htmlprag: parse html
 
-(define topurl
-;;  "http://www.roskilde-festival.dk/object.php?obj=88000c&Letter=alle&code=1") ;; 2005
-    "http://www.roskilde-festival.dk/object.php?obj=539000c&Letter=alle&code=1")
+(define program-topurl
+;;  "http://www.roskilde-festival.dk/object.php?obj=88000c&Letter=alle&code=1")  ;; 2005
+    "http://www.roskilde-festival.dk/object.php?obj=539000c&Letter=alle&code=1") ;; 2006
 (define httpclient '(wget -O -))
 (define convert '(iconv -f iso8859-1 -t utf-8))
 ;;; Some addresses for find-branch-address
@@ -50,22 +50,40 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 ;;; Formats and feature lists:
 (define band-row-format-html
   (string-append "<tr>~%"
-                 "<td><table>~%"
-                 "<tr><td><h3>~a</h3></td></tr>~%" ;; bandname
-                 "<tr><td>~a</td></tr>~%" ;; countries
-                 "<tr><td><img src=\"~a\"></td></tr>~%" ;; img
-                 "<tr><td>~a</td></tr>~%" ;; short description
-                 "<tr><td><table><tr>~%"
-                 "<td><a href=\"~a\">www</a></td>~%" ;; www
-                 "<td><a href=\"~a\">snd</a></td>~%" ;; snd
-                 "<td><a href=\"~a\">feature</a></td>~%"
+                 "<td width=\"280px\">~%"
+                 "<p><h3>~a</h3></p>~%" ;; bandname
+                 "<p>~a<p>~%" ;; countries
+                 "<p><img src=\"~a\"><p>~%" ;; img
+                 "<p>~a</p>~%" ;; short description
+                 "<p>~%"
+                 "<a href=\"~a\">www</a>&nbsp;~%" ;; www
+                 "<a href=\"~a\">snd</a>&nbsp;~%" ;; snd
+                 "<a href=\"~a\">feature</a>&nbsp;~%"
                  ;; feature
-                 "<td><a href=\"~a\">donkey</a></td>~%"
+                 "<a href=\"~a\">donkey</a>&nbsp;~%"
                  ;; donkey
-                 "</tr></table></td></tr>"
-                 "</table></td>~%"
+                 "</p></td>"
                  "<td>~a</td>~%" ;; long description
                  "</tr>~%"))
+
+;; (define band-row-format-html
+;;   (string-append "<tr>~%"
+;;                  "<td><table>~%"
+;;                  "<tr><td><h3>~a</h3></td></tr>~%" ;; bandname
+;;                  "<tr><td>~a</td></tr>~%" ;; countries
+;;                  "<tr><td><img src=\"~a\"></td></tr>~%" ;; img
+;;                  "<tr><td>~a</td></tr>~%" ;; short description
+;;                  "<tr><td><table><tr>~%"
+;;                  "<td><a href=\"~a\">www</a></td>~%" ;; www
+;;                  "<td><a href=\"~a\">snd</a></td>~%" ;; snd
+;;                  "<td><a href=\"~a\">feature</a></td>~%"
+;;                  ;; feature
+;;                  "<td><a href=\"~a\">donkey</a></td>~%"
+;;                  ;; donkey
+;;                  "</tr></table></td></tr>"
+;;                  "</table></td>~%"
+;;                  "<td>~a</td>~%" ;; long description
+;;                  "</tr>~%"))
 
 (define bandlist-page-format-html
   (string-append "<html>~%"
@@ -257,7 +275,7 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
   (url-name-country tree '()))
 
 (define (get-bandlist)
-  (spider-bandlist (bandlist-table (url-body topurl))))
+  (spider-bandlist (bandlist-table (url-body program-topurl))))
 
 
 ;;; just for debugging convenience, I could use format, but I don't wanna!
@@ -282,7 +300,7 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
                    (cdr rest))))))
 
 (define (donkey-search-url actname)
-  (string-append "http://localhost:4080/submit?q=s+"
+  (string-append donkey-top-url "s+"
                              actname))
 
 (define (char->hex c)
@@ -307,26 +325,13 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
                      ""
                      str))
 
-(define (donkey-search-line actname)
-  ;; simply throw out plain html... I could use shtml but I'm too
-  ;; lazy to read the manual right now :-}
-  (format "<p><a href=\"~a\">~a</a></p>~%"
-          (donkey-search-url (url-encode actname))
-          (html-encode actname)))
-
-(define (donkey-search-webpage bandlist filename)
-  (with-output-to-file filename
-    (lambda ()
-      (display (format "<html>~%<body>~%~a~%</body>~%</html>~%"
-                       (map donkey-search-line
-                            (map car
-                                 bandlist)))))))
-
 (define (band-row-html bandlist-item)
   (apply format
          band-row-format-html
          (band-row-featurelist bandlist-item)))
 
+  ;; simply throw out plain html... I could use shtml but I'm too
+  ;; lazy to read the manual right now :-}
 (define (my-bandlist-page-html bandlist filename)
   (with-output-to-file filename
     (lambda ()
@@ -342,6 +347,10 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 
 
 ;;; $Log: program-spider.scm,v $
+;;; Revision 1.4  2006/01/27 19:00:16  friedel
+;;; This already worked fine for the 2005 program, spiking it up for RSS
+;;; generation and forum spidering now
+;;;
 ;;; Revision 1.3  2005/04/24 01:23:22  friedel
 ;;; Improve with-success-or-fail and do-or-f to be slightly more general
 ;;; (to have a better excuse for keeping them)
