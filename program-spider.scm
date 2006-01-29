@@ -3,7 +3,7 @@ IFS=" "
 exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-13 -o srfi-28 -o threads "$0" "$@"
 !#
 
-;;; $Id: program-spider.scm,v 1.4 2006/01/27 19:00:16 friedel Exp friedel $
+;;; $Id: program-spider.scm,v 1.5 2006/01/27 21:28:13 friedel Exp friedel $
 
 ;;;srfi-1: list library
 ;;;srfi-13: string operations
@@ -14,10 +14,15 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 
 (define program-topurl
 ;;  "http://www.roskilde-festival.dk/object.php?obj=88000c&Letter=alle&code=1")  ;; 2005
-    "http://www.roskilde-festival.dk/object.php?obj=539000c&Letter=alle&code=1") ;; 2006
+  "http://www.roskilde-festival.dk/object.php?obj=539000c&Letter=alle&code=1")   ;; 2006
+
+(define forum-topurl
+  "http://www.roskilde-festival.dk/community/index.php?page=300")
+
 (define httpclient '(wget -O -))
 (define convert '(iconv -f iso8859-1 -t utf-8))
 ;;; Some addresses for find-branch-address
+;; for the bandlist
 (define bandlisttable   '(td table tr td (1 . table)))
 (define bandname        '((1 . td) a))
 (define bandinfourl     '(@ href))
@@ -33,6 +38,22 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 
 (define faktboxstart (rx "faktabox start"))
 (define faktboxend (rx "Faktabox slut"))
+
+;; for the forum
+(define forumlisttable
+  '(table tr td table (7 . tr) td table (1 . tr) (1 . td) (1 . table)))
+
+(define threadlisttable
+  forumlisttable) ;; same format, yay
+
+(define postlisttable
+  '(table tr td table (7 . tr) td table (1 . tr) (1 . td) table)) ;; almost the same
+
+
+'( tr td  table)
+
+(define topiclink
+  '((4 . td) table tr (1 . td) (1 . small) a @ class ))
 
 (define donkey-top-url "http://localhost:4080/submit?q=")
 
@@ -136,6 +157,10 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 
 (define split-parens (infix-splitter (rx (| "(" ")" ))))
 
+(define split-space (infix-splitter " "))
+
+(define split-dash (infix-splitter "-"))
+
 (define (elements-between pred1
                           pred2
                           lst)
@@ -172,6 +197,16 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
                                  (find-car look
                                            tree))))))
 
+(define (identity x)
+  x)
+
+(define (filter-branch-address seq tree)
+  (filter identity
+          (map (lambda (x)
+                 (do-or-f (find-branch-address seq
+                                               x)))
+          tree)))
+
 (define (error-or-f? val)
   (or (error? val)
       (not val)))
@@ -207,6 +242,150 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
    (find-branch-address
     bandlisttable
     (faktabox tree))))
+
+(define (forumlist-table tree)
+  (filter-branch-address '((1 . td))
+                         (find-branch-address
+                          forumlisttable
+                          tree)))
+
+(define (threadlist-table tree)
+  (find-branch-address threadlisttable tree))
+
+(define (postlist-table tree)
+  (filter (lambda (x)
+            (do-or-f (find-branch-address topiclink
+                                          x)))
+          (filter-car 'tr (find-branch-address postlisttable tree))))
+
+
+
+(define (filter-and-append-strings seq tree)
+  (map (lambda (x) (apply string-append (cdr x)))
+       (filter-branch-address seq
+                              tree)))
+
+(define (posts-posters tree)
+  (map (lambda (x) (shtml->html (cddr x)))
+       (filter-branch-address '((1 . td))
+                              tree)))
+
+(define (posts-subjects tree)
+  (filter-and-append-strings '((4 . td) table tr td b)
+                             tree))
+
+(define (posts-dates tree)
+  (map mangle-date
+       (filter-and-append-strings '((4 . td) table tr (1 . td) small)
+                                  tree)))
+
+(define (posts-texts tree)
+  (map (lambda (x) (apply string-append (filter string? x)))
+       (filter-branch-address '((4 . td))
+                              tree)))
+
+(define (posts-replylinks tree)
+  (filter-and-append-strings '((4 . td) table tr (1 . td)  (1 . small) a @ href)
+                             tree))
+
+(define (posts-list tree)
+  (map list
+       (posts-posters tree)
+       (posts-subjects tree)
+       (posts-dates tree)
+       (posts-texts tree)
+       (posts-replylinks tree)))
+
+(define (thread-titles tree)
+  (filter-and-append-strings '((1 . td) a b) tree))
+
+(define (thread-links tree)
+  (filter-and-append-strings '((1 . td) a @ href) tree))
+
+(define (drop-uneven tree accum)
+  (if (null? tree)
+      (reverse accum)
+      (drop-uneven (cddr tree)
+                   (cons (cadr tree) accum))))
+
+(define (thread-dates tree)
+  (map (lambda (x) (let ((ls (cddr x)))
+                     (mangle-date
+                      (string-append (first ls)
+                                     " "
+                                     (third ls)))))
+       (drop-uneven (filter-branch-address '((5 . td)) tree)
+                    '())))
+
+(define (thread-list tree)
+  (map list
+       (thread-titles tree)
+       (thread-links tree)
+       (thread-dates tree)))
+
+(define (forumlist-titles tree)
+  (filter-and-append-strings '(a b)
+                              tree))
+
+(define (forumlist-links tree)
+  (filter-and-append-strings '(a @ href)
+                             tree))
+
+(define (forumlist-descriptions tree)
+  (map (lambda (x) (apply string-append (cddr x)))
+       (filter (lambda (x) (string? (list-ref x 2)))
+               tree)))
+
+(define (forumlist-list tree)
+  (map list
+       (forumlist-titles tree)
+       (forumlist-links tree)
+       (forumlist-descriptions tree)))
+
+(define (mangle-date str)
+  "mangle a date string from the site such that it can be
+compared alphabetically, i.e. from '19-10-2005 13:20' to
+'2005-10-19 13:20'"
+  (let* ((date-clock (split-space str))
+         (day-mon-year (split-dash (first date-clock))))
+    (string-append (third day-mon-year)
+                   "-"
+                   (second day-mon-year)
+                   "-"
+                   (first day-mon-year)
+                   " "
+                   (second date-clock))))
+
+(define (laterthan firstdate seconddate)
+  (or (string> firstdate seconddate)
+      (string= firstdate seconddate)))
+
+(define (posts-in-thread-since thread-url date)
+  "date: YYYY-MM-DD HH:MM"
+  (let ((allposts (posts-list (postlist-table (url-body thread-url)))))
+    (filter (lambda (x) (laterthan (third x) date))
+            allposts)))
+
+(define (posts-in-forum-since forum-url date)
+  (let* ((laterdate (lambda (x) (laterthan (third x) date)))
+         (threads (filter laterdate (thread-list (threadlist-table (url-body forum-url))))))
+    (if (not (null? threads))
+        (map (lambda (thread)
+               (append thread
+                       (posts-in-thread-since (second thread) date)))
+             threads)
+         threads)))
+
+(define (posts-global-since date)
+  (let* ((forums (forumlist-list (forumlist-table (url-body forum-topurl)))))
+    (if (not (null? forums))
+        (map (lambda (forum)
+               (let ((posts (posts-in-forum-since (second forum) date)))
+                 (if (null? posts)
+                     #f
+                     (append forum posts))))
+             forums)
+        forums)))
 
 (define (get-html-branch address tree)
   (with-success-or-fail
@@ -336,8 +515,16 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
   (with-output-to-file filename
     (lambda ()
       (display (format bandlist-page-format-html
-                       (map band-row-html bandlist))))))
+                       (apply string-append
+                              (map band-row-html bandlist)))))))
 
+
+(define (dump-bandlist-to-file bandlist filename)
+  (with-output-to-file filename (lambda () (display (format "~s" bandlist)))))
+
+(define (my-forum-summary-page global-posts-list filename)
+  "global-posts-list is the value returned by posts-global-since"
+  
 
 ;;(display-list (get-first-level))
 
@@ -347,6 +534,9 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 
 
 ;;; $Log: program-spider.scm,v $
+;;; Revision 1.5  2006/01/27 21:28:13  friedel
+;;; moving out superfluous functions, trying to get rid of the () in the output
+;;;
 ;;; Revision 1.4  2006/01/27 19:00:16  friedel
 ;;; This already worked fine for the 2005 program, spiking it up for RSS
 ;;; generation and forum spidering now
