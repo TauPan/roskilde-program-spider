@@ -3,7 +3,7 @@ IFS=" "
 exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-13 -o srfi-28 -o threads "$0" "$@"
 !#
 
-;;; $Id: program-spider.scm,v 1.5 2006/01/27 21:28:13 friedel Exp friedel $
+;;; $Id: program-spider.scm,v 1.6 2006/01/29 21:46:34 friedel Exp friedel $
 
 ;;;srfi-1: list library
 ;;;srfi-13: string operations
@@ -68,10 +68,10 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 (define idx-snd 6)
 (define idx-feature 7)
 
-;;; Formats and feature lists:
+;;; Formats:
 (define band-row-format-html
   (string-append "<tr>~%"
-                 "<td width=\"280px\">~%"
+                 "<td>~%"
                  "<p><h3>~a</h3></p>~%" ;; bandname
                  "<p>~a<p>~%" ;; countries
                  "<p><img src=\"~a\"><p>~%" ;; img
@@ -87,34 +87,6 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
                  "<td>~a</td>~%" ;; long description
                  "</tr>~%"))
 
-;; (define band-row-format-html
-;;   (string-append "<tr>~%"
-;;                  "<td><table>~%"
-;;                  "<tr><td><h3>~a</h3></td></tr>~%" ;; bandname
-;;                  "<tr><td>~a</td></tr>~%" ;; countries
-;;                  "<tr><td><img src=\"~a\"></td></tr>~%" ;; img
-;;                  "<tr><td>~a</td></tr>~%" ;; short description
-;;                  "<tr><td><table><tr>~%"
-;;                  "<td><a href=\"~a\">www</a></td>~%" ;; www
-;;                  "<td><a href=\"~a\">snd</a></td>~%" ;; snd
-;;                  "<td><a href=\"~a\">feature</a></td>~%"
-;;                  ;; feature
-;;                  "<td><a href=\"~a\">donkey</a></td>~%"
-;;                  ;; donkey
-;;                  "</tr></table></td></tr>"
-;;                  "</table></td>~%"
-;;                  "<td>~a</td>~%" ;; long description
-;;                  "</tr>~%"))
-
-(define bandlist-page-format-html
-  (string-append "<html>~%"
-                 "<body>~%"
-                 "<table border=\"1\" rules=\"rows\">~%"
-                 "~a~%"
-                 "</table>~%"
-                 "</body>~%"
-                 "</html>~%"))
-
 (define (band-row-featurelist bandlist-item)
   (append (map (lambda (x) (list-ref bandlist-item x))
                (list idx-bandname
@@ -126,6 +98,87 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
                      idx-feature))
           (list (donkey-search-url (url-encode (car bandlist-item)))
                 (list-ref bandlist-item idx-longdesc))))
+
+(define bandlist-page-format-html
+  (string-append "<html>~%"
+                 "<body>~%"
+                 "<table border=\"1\" rules=\"rows\">~%"
+                 "~a~%"
+                 "</table>~%"
+                 "</body>~%"
+                 "</html>~%"))
+
+(define forum-summary-page-format-html
+  (string-append "<html>~%"
+                 "<style type=\"text/css\">~%"
+                 "table { width:100%; table-layout: fixed;}~%"
+                 "td {  padding: 8px; }~%"
+                 "</style>~%"
+                 "<body>~%"
+                 "<h1>Forum summary for posts since ~a, generated on ~a.</h1>~%"
+                 "<table border=\"1\" rules=\"rows\">~%"
+                 "<colgroup>~%"
+                 "<col width=\"20%\">~%"
+                 "<col width=\"65%\">~%"
+                 "<col width=\"15%\" align=\"right\">~%"
+                 "</colgroup>~%"
+                 "~a~%"
+                 "</table>~%"
+                 "</body>~%"
+                 "</html>~%"))
+
+(define forum-row-format-html
+  (string-append "<tr style=\"border-style:hidden;\">~%"
+                 "<td colspan=\"3\"><h2>Forum: <a href=\"~a\">~a</a></h2>~%"
+                 "</td>~%"
+                 "</tr>~%"
+                 "~a~%"))
+
+(define (forum-row-featurelist forum-item)
+  (append (map (lambda (x) (list-ref forum-item x))
+               (list 1
+                     0))
+          (list (apply string-append
+                       (map thread-row-html
+                            (cdddr forum-item))))))
+  
+(define thread-row-format-html
+  (string-append "<tr style=\"border-style:double;\">~%"
+                 "<td colspan=\"3\"><h3>Thread: <a href=\"~a\">~a</a></h3>~%"
+                 "</td>~%"
+                 "</tr>~%"
+                 "~a~%"))
+
+(define (thread-row-featurelist thread-item)
+  (append (map (lambda (x) (list-ref thread-item x))
+               (list 1
+                     0))
+          (list (apply string-append
+                       (map post-row-html
+                            (cdddr thread-item))))))
+
+
+(define post-row-format-html
+  (string-append "<tr style=\"border-bottom-style:hidden;\">~%"
+                 "<td><p>~a</p>~%"
+                 "</td>~%"
+                 "<td><h4>~a</h4></td>~%"
+                 "<td><small><p>~a</p></small></td>~%"
+                 "</tr>~%"
+                 "<tr>~%"
+                 "<td colspan=\"3\">~%"
+                 "<p>"
+                 "~a~%"
+                 "</p>"
+                 "</td>~%"
+                 "</tr>~%"))
+
+(define (post-row-featurelist post-item)
+  (map (lambda (x) (list-ref post-item x))
+               (list 0
+                     1
+                     2
+                     3)))
 
 ;;; -------------------------------------------------------------
 (define (url-body url)
@@ -265,22 +318,27 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
        (filter-branch-address seq
                               tree)))
 
+(define (filter-and-convert-strings seq tree)
+  (map (lambda (x) (shtml->html (cdr x)))
+       (filter-branch-address seq
+                              tree)))
+
 (define (posts-posters tree)
   (map (lambda (x) (shtml->html (cddr x)))
        (filter-branch-address '((1 . td))
                               tree)))
 
 (define (posts-subjects tree)
-  (filter-and-append-strings '((4 . td) table tr td b)
-                             tree))
+  (filter-and-convert-strings '((4 . td) table tr td b)
+                              tree))
 
 (define (posts-dates tree)
   (map mangle-date
-       (filter-and-append-strings '((4 . td) table tr (1 . td) small)
-                                  tree)))
+       (filter-and-convert-strings '((4 . td) table tr (1 . td) small)
+                                   tree)))
 
 (define (posts-texts tree)
-  (map (lambda (x) (apply string-append (filter string? x)))
+  (map (lambda (x) (shtml->html (drop x 6)))
        (filter-branch-address '((4 . td))
                               tree)))
 
@@ -297,7 +355,7 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
        (posts-replylinks tree)))
 
 (define (thread-titles tree)
-  (filter-and-append-strings '((1 . td) a b) tree))
+  (filter-and-convert-strings '((1 . td) a b) tree))
 
 (define (thread-links tree)
   (filter-and-append-strings '((1 . td) a @ href) tree))
@@ -324,7 +382,7 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
        (thread-dates tree)))
 
 (define (forumlist-titles tree)
-  (filter-and-append-strings '(a b)
+  (filter-and-convert-strings '(a b)
                               tree))
 
 (define (forumlist-links tree)
@@ -332,7 +390,7 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
                              tree))
 
 (define (forumlist-descriptions tree)
-  (map (lambda (x) (apply string-append (cddr x)))
+  (map (lambda (x) (shtml->html (cddr x)))
        (filter (lambda (x) (string? (list-ref x 2)))
                tree)))
 
@@ -518,13 +576,35 @@ compared alphabetically, i.e. from '19-10-2005 13:20' to
                        (apply string-append
                               (map band-row-html bandlist)))))))
 
-
+;;(with-output-to-file "global-posts-list-2006-Jan-1-29.scm" (lambda () (display (format "~s" global-posts-list))))
 (define (dump-bandlist-to-file bandlist filename)
   (with-output-to-file filename (lambda () (display (format "~s" bandlist)))))
 
-(define (my-forum-summary-page global-posts-list filename)
-  "global-posts-list is the value returned by posts-global-since"
-  
+(define (post-row-html post-entry)
+  (apply format post-row-format-html
+         (post-row-featurelist post-entry)))
+
+(define (thread-row-html thread-entry)
+  (apply format thread-row-format-html
+         (thread-row-featurelist thread-entry)))
+
+(define (forum-row-html forum-entry)
+  (apply format forum-row-format-html
+         (forum-row-featurelist forum-entry)))
+
+(define (now)
+  (run/string (date "+%Y-%m-%d %H:%M")))
+
+(define (my-forum-summary-page global-posts-list date filename)
+  (with-output-to-file filename
+    (lambda ()
+      (display (format forum-summary-page-format-html
+                       date
+                       (now)
+                       (apply string-append
+                              (map forum-row-html
+                                   (filter identity
+                                           global-posts-list))))))))
 
 ;;(display-list (get-first-level))
 
@@ -534,6 +614,9 @@ compared alphabetically, i.e. from '19-10-2005 13:20' to
 
 
 ;;; $Log: program-spider.scm,v $
+;;; Revision 1.6  2006/01/29 21:46:34  friedel
+;;; spidering the forums works, now for the output...
+;;;
 ;;; Revision 1.5  2006/01/27 21:28:13  friedel
 ;;; moving out superfluous functions, trying to get rid of the () in the output
 ;;;
