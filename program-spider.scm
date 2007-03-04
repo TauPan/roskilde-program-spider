@@ -1,25 +1,28 @@
 #!/bin/sh
 IFS=" "
-exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-13 -o srfi-28 -o threads "$0" "$@"
+cd `dirname $0`
+exec /usr/lib/scsh-0.6/scshvm -o /usr/lib/scsh-0.6/scshvm -h 8000000 -i /usr/lib/scsh-0.6/scsh.image -lel /usr/local/lib/scsh/modules/0.6/htmlprag-0.13/load.scm -o htmlprag -o handle -o conditions -o srfi-13 -o srfi-28 -o threads -l $0 $@
 !#
 
-;;; $Id: program-spider.scm,v 1.6 2006/01/29 21:46:34 friedel Exp friedel $
+;;; $Id: program-spider.scm,v 1.7 2006/01/30 11:51:29 friedel Exp friedel $
 
 ;;;srfi-1: list library
 ;;;srfi-13: string operations
-;;;srfi-42:
+;;;srfi-28: basic format strings
 ;;;handle: error handling
 ;;;conditions: condition checking
+;;;threads: needed by conditions
 ;;;htmlprag: parse html
 
 (define program-topurl
-;;  "http://www.roskilde-festival.dk/object.php?obj=88000c&Letter=alle&code=1")  ;; 2005
-  "http://www.roskilde-festival.dk/object.php?obj=539000c&Letter=alle&code=1")   ;; 2006
-
+; "http://www.roskilde-festival.dk/object.php?obj=88000c&Letter=alle&code=1")  ;; 2005
+; "http://www.roskilde-festival.dk/object.php?obj=539000c&Letter=alle&code=1")   ;; 2006
+"http://www.roskilde-festival.dk/object.php?obj=823000c&code=1")
 (define forum-topurl
   "http://www.roskilde-festival.dk/community/index.php?page=300")
 
 (define httpclient '(wget -O -))
+(define sleeptime 5000)
 (define convert '(iconv -f iso8859-1 -t utf-8))
 ;;; Some addresses for find-branch-address
 ;; for the bandlist
@@ -56,6 +59,9 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
   '((4 . td) table tr (1 . td) (1 . small) a @ class ))
 
 (define donkey-top-url "http://localhost:4080/submit?q=")
+(define allmusic-search-format
+  "http://www.allmusic.com/cg/amg.dll?P=amg&sql=~a&x=0&y=0&opt1=1&sourceid=mozilla-search")
+(define lastfm-top-url "http://www.last.fm/music/")
 
 ;;; some indexes
 
@@ -71,18 +77,24 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 ;;; Formats:
 (define band-row-format-html
   (string-append "<tr>~%"
-                 "<td>~%"
+                 "<td width=\"250px\">~%"
                  "<p><h3>~a</h3></p>~%" ;; bandname
                  "<p>~a<p>~%" ;; countries
                  "<p><img src=\"~a\"><p>~%" ;; img
                  "<p>~a</p>~%" ;; short description
                  "<p>~%"
+                 "<small>~%"
                  "<a href=\"~a\">www</a>&nbsp;~%" ;; www
                  "<a href=\"~a\">snd</a>&nbsp;~%" ;; snd
                  "<a href=\"~a\">feature</a>&nbsp;~%"
                  ;; feature
+                 "<a href=\"~a\">allmusic</a>&nbsp;~%"
+                 ;; allmusic
+                 "<a href=\"~a\">last.fm</a>&nbsp;~%"
+                 ;; last.fm
                  "<a href=\"~a\">donkey</a>&nbsp;~%"
                  ;; donkey
+                 "</small>~%"
                  "</p></td>"
                  "<td>~a</td>~%" ;; long description
                  "</tr>~%"))
@@ -96,8 +108,13 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
                      idx-www
                      idx-snd
                      idx-feature))
-          (list (donkey-search-url (url-encode (car bandlist-item)))
-                (list-ref bandlist-item idx-longdesc))))
+          (let* ((bandname (car bandlist-item))
+                 (bandurlspace (space-encode bandname))
+                 (bandurlenc (url-encode bandname)))
+            (list (allmusic-search-url bandurlspace)
+                  (lastfm-search-url bandurlspace)
+                  (donkey-search-url (url-encode (car bandlist-item)))
+                (list-ref bandlist-item idx-longdesc)))))
 
 (define bandlist-page-format-html
   (string-append "<html>~%"
@@ -141,7 +158,7 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
           (list (apply string-append
                        (map thread-row-html
                             (cdddr forum-item))))))
-  
+
 (define thread-row-format-html
   (string-append "<tr style=\"border-style:double;\">~%"
                  "<td colspan=\"3\"><h3>Thread: <a href=\"~a\">~a</a></h3>~%"
@@ -182,12 +199,14 @@ exec scsh -s -lel htmlprag/load.scm -o htmlprag -o handle -o conditions -o srfi-
 
 ;;; -------------------------------------------------------------
 (define (url-body url)
+  (sleep sleeptime)
   (cdr (find-branch-address '(html body)
                             (html->shtml
                              (run/string ,(append httpclient
                                                   (list url)))))))
 
 (define (get-url-string url)
+  (sleep sleeptime)
   (run/string (| ,(append httpclient (list url))
                  ,convert)))
 
@@ -471,7 +490,7 @@ compared alphabetically, i.e. from '19-10-2005 13:20' to
                  (do-or-f
                   (cons (second (find-branch-address bandinfourl
                                                      el))
-                        (let ((y (split-parens (third el))))
+                        (let ((y (split-parens (shtml->html (drop el 2)))))
                           (list (string-trim-both (car y))
                                 (split-slash (second y)))))))
                #f)))
@@ -540,6 +559,12 @@ compared alphabetically, i.e. from '19-10-2005 13:20' to
   (string-append donkey-top-url "s+"
                              actname))
 
+(define (allmusic-search-url actname)
+  (format allmusic-search-format actname))
+
+(define (lastfm-search-url actname)
+  (string-append lastfm-top-url actname))
+
 (define (char->hex c)
   (string-upcase (number->string (char->ascii c)
                                  16)))
@@ -552,6 +577,13 @@ compared alphabetically, i.e. from '19-10-2005 13:20' to
                         s))
                      ""
                      str))
+
+(define (space-encode str)
+  (string-map (lambda (c)
+                (if (eqv? c #\space)
+                    #\+
+                    c))
+              str))
 
 (define (url-encode str)
   (string-fold-right (lambda (c s)
@@ -606,6 +638,49 @@ compared alphabetically, i.e. from '19-10-2005 13:20' to
                                    (filter identity
                                            global-posts-list))))))))
 
+(define (dashdate date)
+  (let* ((date-clock (split-space date)))
+    (string-append (car date-clock) "-" (cadr date-clock))))
+
+(define (do-forum-summary since)
+  (let* ((until (string-drop-right (now) 1))
+         (until-dashed (dashdate until))
+         (since-dashed (dashdate since))
+         (global-posts-list (posts-global-since since))
+         (outfile (string-append "forum-summary-"
+                                 since-dashed
+                                 "--"
+                                 until-dashed
+                                 ".html")))
+    (display (format "Writing forum summary from ~s to ~s to file ~s~%"
+                     since
+                     until
+                     outfile))
+    (my-forum-summary-page global-posts-list since outfile)
+    (display (format "Opening summary page (~s) in browser.~%"
+                     outfile))
+    (run (wwwtf ,outfile))))
+
+(define (do-bandlist)
+  (let* ((bandlist (get-bandlist))
+         (today (car (split-space (now))))
+         (dumpfile (string-append "my-bandlist-"
+                                  today
+                                  ".scm"))
+         (htmlfile (string-append "my-bandlist-2006"
+                                  ".html")))
+    (display (format "Dumping bandlist to file ~s.~%"
+                     dumpfile))
+    (dump-bandlist-to-file bandlist dumpfile)
+    (display (format "Rendering bandlist to file ~s~%"
+                     htmlfile))
+    (my-bandlist-page-html bandlist htmlfile)
+    (display (format "Copying bandlist page to http://dudelab.org/~~taupan/~s~%"
+                     htmlfile))
+    (run (scp ,htmlfile "dudelab:public_html/"))
+    (display (format "Opening bandlist page in browser.~%"))
+    (run (wwwt ,(string-append "http://dudelab.org/~taupan/" htmlfile)))))
+
 ;;(display-list (get-first-level))
 
 ;;; Local Variables:
@@ -614,6 +689,10 @@ compared alphabetically, i.e. from '19-10-2005 13:20' to
 
 
 ;;; $Log: program-spider.scm,v $
+;;; Revision 1.7  2006/01/30 11:51:29  friedel
+;;; parsing and writing html for the forum threads works nicely... hell is
+;;; this code a mess!
+;;;
 ;;; Revision 1.6  2006/01/29 21:46:34  friedel
 ;;; spidering the forums works, now for the output...
 ;;;
@@ -644,3 +723,7 @@ y
 y
 
 !#
+
+;;;Local variables:
+;;;scheme-program-name: /home/friedel/roskilde/roskilde.scm
+;;;End:
