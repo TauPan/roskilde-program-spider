@@ -10,3 +10,11 @@ class TestMain(object):
         assert type(ret) == str
         data = json.loads(ret)
         assert data
+
+class TestBandlist(object):
+
+    def test_returns_bandlist(self):
+        ret = main.bandlist(main.BASEURL)
+        # assuming we have a dictionary by band name
+        bob = 'BOB DYLAN WITH HIS BAND'
+        assert bob in ret
