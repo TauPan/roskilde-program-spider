@@ -16,3 +16,6 @@ BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
 
 def main(argv):
     return '[true]'
+
+def bandlist(url):
+    return {'BOB DYLAN WITH HIS BAND': {}}
