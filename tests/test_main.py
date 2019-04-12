@@ -14,7 +14,7 @@ class TestMain(object):
 class TestBandlist(object):
 
     def test_returns_bandlist(self):
-        ret = main.bandlist(main.BASEURL)
+        ret = main.bandlist()
         # assuming we have a dictionary by band name
         bob = 'BOB DYLAN WITH HIS BAND'
         assert bob in ret
