@@ -15,4 +15,4 @@ import requests
 BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
 
 def main(argv):
-    return ''
+    return '[true]'
