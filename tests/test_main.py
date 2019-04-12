@@ -2,5 +2,8 @@ import pytest
 
 import main
 
-def test_main():
-    pass
+class TestMain(object):
+
+    def test_returns_string(self):
+        ret = main.main([])
+        assert type(ret) == str
