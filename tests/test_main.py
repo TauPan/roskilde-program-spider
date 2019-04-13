@@ -22,6 +22,7 @@ class TestBandlist(object):
         # first attempts only went until "Zeitkratzer" omitting the
         # warm-up acts
         assert len(ret) > 150
+        assert 'ZAAR' in ret
 
 class TestParseMainItem(object):
 
