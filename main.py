@@ -23,8 +23,9 @@ def main(argv):
 def bandlist(url=BASEURL):
     getbands = lxml.cssselect.CSSSelector('div[class="item-inner"]')
     with requests.Session() as session:
-        overview = lxml.etree.fromstring(session.get(BASEURL).content.decode('utf-8'),
-                                         lxml.etree.HTMLParser())
+        overview = lxml.etree.fromstring(
+            session.get(BASEURL).text,
+            lxml.etree.HTMLParser())
         bands = dict(parse_main_item(i)
                      for i in getbands(overview))
     return bands
