@@ -28,6 +28,6 @@ def bandlist(url=BASEURL):
 
 def parse_main_item(item):
     getlink = lxml.cssselect.CSSSelector('a')
-    a = getlink(item)
-    key = a[0].text.strip()
-    return key, {}
+    a = getlink(item)[0]
+    key = a.text.strip()
+    return key, {'link': a.attrib['href']}
