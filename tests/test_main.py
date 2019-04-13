@@ -23,6 +23,7 @@ class TestBandlist(object):
         # warm-up acts
         assert len(ret) > 150
         assert 'ZAAR' in ret
+        assert 'ZUSA' in ret
 
 class TestParseMainItem(object):
 
