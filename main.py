@@ -23,7 +23,8 @@ def bandlist(url=BASEURL):
     with requests.Session() as session:
         overview = lxml.etree.fromstring(session.get(BASEURL).content.decode('utf-8'),
                                          lxml.etree.HTMLParser())
-        bands = getbands(overview)
+        bands = dict(parse_main_item(i)
+                     for i in getbands(overview))
     return bands
 
 def parse_main_item(item):
