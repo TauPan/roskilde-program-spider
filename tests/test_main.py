@@ -39,3 +39,4 @@ BOB DYLAN WITH HIS BAND
     def test_has_key(self):
         key, val = main.parse_main_item(self.bob)
         assert key == 'BOB DYLAN WITH HIS BAND'
+        assert val['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
