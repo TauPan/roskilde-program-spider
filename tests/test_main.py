@@ -1,3 +1,4 @@
+import datetime
 import json
 import lxml.etree
 import pytest
@@ -26,6 +27,11 @@ class TestBandlist(object):
         assert len(ret) > 150
         assert 'ZAAR' in ret
         assert 'ZUSA' in ret
+
+    def test_bob_properties(self):
+        bob = main.bandlist()[BOBKEY]
+        assert bob['stage'] == 'Orange'
+        assert bob['date'] == datetime.date(2019, 7, 3)
 
 class TestParseMainItem(object):
 
