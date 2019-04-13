@@ -17,18 +17,31 @@ import requests
 
 BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
 
+SESSION = None
+
 def main(argv):
     return '[true]'
 
 def bandlist(url=BASEURL):
     getbands = lxml.cssselect.CSSSelector('div[class="item-inner"]')
     with requests.Session() as session:
-        overview = lxml.etree.fromstring(
-            session.get(BASEURL).text,
-            lxml.etree.HTMLParser())
+        SESSION = session
+        overview = get_parsed(BASEURL)
         bands = dict(parse_main_item(i)
                      for i in getbands(overview))
     return bands
+
+def get_session():
+    global SESSION
+    if SESSION is None:
+        SESSION = requests.Session()
+    return SESSION
+
+def get_parsed(url):
+    session = get_session()
+    return lxml.etree.fromstring(
+        session.get(url).text,
+        lxml.etree.HTMLParser())
 
 def parse_main_item(item):
     getlink = lxml.cssselect.CSSSelector('a')
