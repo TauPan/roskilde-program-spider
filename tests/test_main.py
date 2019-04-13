@@ -51,3 +51,15 @@ BOB DYLAN WITH HIS BAND
         assert key == BOBKEY
         assert val['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
         assert val['country'] == 'US'
+
+
+class TestParseActPAge(object):
+
+    bobpage = lxml.etree.fromstring(
+        open('bob-dylan-2019-04-13.html', 'r').read(),
+        lxml.etree.HTMLParser()
+    )
+
+    def test_has_stage(self):
+        ret = main.parse_act_page(self.bobpage)
+        assert ret['stage'] == 'Orange'
