@@ -35,3 +35,12 @@ def parse_main_item(item):
         'div[class="item-meta"] > div[class="country"]')
     return key, {'link': a.attrib['href'],
                  'country': getcountry(a)[0].text}
+
+
+def parse_act_page(item):
+    getinfo = lxml.cssselect.CSSSelector('div[class="info"]')
+    getblocks = lxml.cssselect.CSSSelector('div[class="block"]')
+    blocks = getblocks(getinfo(item)[0])
+    return {
+        'stage': blocks[0].xpath('text()')[0]
+    }
