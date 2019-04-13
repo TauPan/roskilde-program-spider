@@ -6,6 +6,8 @@
 
 """
 
+import datetime
+import dateutil.parser
 import os
 import sys
 
@@ -42,5 +44,9 @@ def parse_act_page(item):
     getblocks = lxml.cssselect.CSSSelector('div[class="block"]')
     blocks = getblocks(getinfo(item)[0])
     return {
-        'stage': blocks[0].xpath('text()')[0]
+        'stage': blocks[0].xpath('text()')[0],
+        'date': dateutil.parser.parse(
+                blocks[1]
+                .xpath('*//text()')
+                [1]).date()
     }
