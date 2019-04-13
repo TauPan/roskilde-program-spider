@@ -4,6 +4,8 @@ import pytest
 
 import main
 
+BOBKEY = 'BOB DYLAN WITH HIS BAND'
+
 class TestMain(object):
 
     def test_returns_string(self):
@@ -17,7 +19,7 @@ class TestBandlist(object):
     def test_returns_bandlist(self):
         ret = main.bandlist()
         # assuming we have a dictionary by band name
-        bob = 'BOB DYLAN WITH HIS BAND'
+        bob = BOBKEY
         assert bob in ret
         # first attempts only went until "Zeitkratzer" omitting the
         # warm-up acts
@@ -40,6 +42,6 @@ BOB DYLAN WITH HIS BAND
 
     def test_has_key(self):
         key, val = main.parse_main_item(self.bob)
-        assert key == 'BOB DYLAN WITH HIS BAND'
+        assert key == BOBKEY
         assert val['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
         assert val['country'] == 'US'
