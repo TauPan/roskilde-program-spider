@@ -18,3 +18,6 @@ class TestBandlist(object):
         # assuming we have a dictionary by band name
         bob = 'BOB DYLAN WITH HIS BAND'
         assert bob in ret
+        # first attempts only went until "Zeitkratzer" omitting the
+        # warm-up acts
+        assert len(ret) > 150
