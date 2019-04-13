@@ -22,13 +22,16 @@ SESSION = None
 def main(argv):
     return '[true]'
 
-def bandlist(url=BASEURL):
-    getbands = lxml.cssselect.CSSSelector('div[class="item-inner"]')
+def get_main():
     with requests.Session() as session:
         SESSION = session
         overview = get_parsed(BASEURL)
-        bands = dict(parse_main_item(i)
-                     for i in getbands(overview))
+        return bandlist(overview)
+
+def bandlist(overview):
+    getbands = lxml.cssselect.CSSSelector('div[class="item-inner"]')
+    bands = dict(parse_main_item(i)
+                 for i in getbands(overview))
     return bands
 
 def get_session():

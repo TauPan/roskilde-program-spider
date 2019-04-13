@@ -17,8 +17,19 @@ class TestMain(object):
 
 class TestBandlist(object):
 
-    def test_returns_bandlist(self):
-        ret = main.bandlist()
+    @pytest.fixture
+    def bandlist(self):
+        return lxml.etree.fromstring(
+            open('line-up-2019-04-13.html', 'r').read(),
+            lxml.etree.HTMLParser()
+        )
+
+    @pytest.fixture
+    def parsed_bandlist(self, bandlist):
+        return main.bandlist(bandlist)
+
+    def test_returns_bandlist(self, parsed_bandlist):
+        ret = parsed_bandlist
         # assuming we have a dictionary by band name
         bob = BOBKEY
         assert bob in ret
@@ -28,8 +39,8 @@ class TestBandlist(object):
         assert 'ZAAR' in ret
         assert 'ZUSA' in ret
 
-    def test_bob_properties(self):
-        bob = main.bandlist()[BOBKEY]
+    def test_bob_properties(self, parsed_bandlist):
+        bob = parsed_bandlist[BOBKEY]
         assert bob['stage'] == 'Orange'
         assert bob['date'] == datetime.date(2019, 7, 3)
 
