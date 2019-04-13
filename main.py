@@ -20,9 +20,14 @@ def main(argv):
 
 def bandlist(url=BASEURL):
     getbands = lxml.cssselect.CSSSelector('body > div.app > div.pages > div > div.PosterViewModule.week > div > div > div > div > div')
-    getlink = lxml.cssselect.CSSSelector('a')
     with requests.Session() as session:
         overview = lxml.etree.fromstring(session.get(BASEURL).content.decode('utf-8'),
                                          lxml.etree.HTMLParser())
         bands = getbands(overview)
     return bands
+
+def parse_main_item(item):
+    getlink = lxml.cssselect.CSSSelector('a')
+    a = getlink(item)
+    key = a[0].text.strip()
+    return key, {}
