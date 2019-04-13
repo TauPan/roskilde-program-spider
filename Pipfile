@@ -11,6 +11,7 @@ pytest-mock = "*"
 requests = "*"
 lxml = "*"
 cssselect = "*"
+python-dateutil = "*"
 
 [requires]
 python_version = "3.7"
