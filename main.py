@@ -30,4 +30,7 @@ def parse_main_item(item):
     getlink = lxml.cssselect.CSSSelector('a')
     a = getlink(item)[0]
     key = a.text.strip()
-    return key, {'link': a.attrib['href']}
+    getcountry = lxml.cssselect.CSSSelector(
+        'div[class="item-meta"] > div[class="country"]')
+    return key, {'link': a.attrib['href'],
+                 'country': getcountry(a)[0].text}
