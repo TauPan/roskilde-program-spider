@@ -67,3 +67,6 @@ class TestParseActPAge(object):
 
     def test_has_stage(self, parsed_bob):
         assert parsed_bob['stage'] == 'Orange'
+
+    def test_has_date(self, parsed_bob):
+        assert parsed_bob['date'] == datetime.date(2019, 7, 3)
