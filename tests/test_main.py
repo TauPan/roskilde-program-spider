@@ -60,6 +60,10 @@ class TestParseActPAge(object):
         lxml.etree.HTMLParser()
     )
 
-    def test_has_stage(self):
-        ret = main.parse_act_page(self.bobpage)
-        assert ret['stage'] == 'Orange'
+
+    @pytest.fixture
+    def parsed_bob(self):
+        return main.parse_act_page(self.bobpage)
+
+    def test_has_stage(self, parsed_bob):
+        assert parsed_bob['stage'] == 'Orange'
