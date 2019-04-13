@@ -1,6 +1,7 @@
 import datetime
 import json
 import lxml.etree
+import os
 import pytest
 
 import main
@@ -20,7 +21,7 @@ class TestBandlist(object):
     @pytest.fixture
     def bandlist(self):
         return lxml.etree.fromstring(
-            open('line-up-2019-04-13.html', 'r').read(),
+            open(os.path.dirname(__file__) + '/line-up-2019-04-13.html', 'r').read(),
             lxml.etree.HTMLParser()
         )
 
@@ -67,7 +68,7 @@ BOB DYLAN WITH HIS BAND
 class TestParseActPAge(object):
 
     bobpage = lxml.etree.fromstring(
-        open('bob-dylan-2019-04-13.html', 'r').read(),
+        open(os.path.dirname(__file__) + '/bob-dylan-2019-04-13.html', 'r').read(),
         lxml.etree.HTMLParser()
     )
 
