@@ -8,6 +8,11 @@ import main
 
 BOBKEY = 'BOB DYLAN WITH HIS BAND'
 
+
+@pytest.fixture(autouse=True)
+def prevent_requests(mocker):
+    mocker.patch('main.requests')
+
 class TestMain(object):
 
     def test_returns_string(self):
