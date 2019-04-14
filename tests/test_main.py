@@ -45,8 +45,8 @@ class TestBandlist(object):
         assert bob['stage'] == 'Orange'
         assert bob['date'] == datetime.date(2019, 7, 3)
 
-class TestParseMainItem(object):
 
+class WithBob(object):
     bob = lxml.etree.fromstring(
         b'''<div class="item-inner">
 <a href="/en/years/2019/acts/bob-dylan-with-his-band/" class="name OutlineAnchorPosterComp">
@@ -58,6 +58,9 @@ BOB DYLAN WITH HIS BAND
 </a>
 </div>''')
 
+
+class TestParseMainItem(WithBob):
+
     def test_has_key(self):
         key, val = main.parse_main_item(self.bob)
         assert key == BOBKEY
@@ -65,17 +68,19 @@ BOB DYLAN WITH HIS BAND
         assert val['country'] == 'US'
 
 
-class TestParseActPAge(object):
-
+class WithBobPage(WithBob):
     bobpage = lxml.etree.fromstring(
         open(os.path.dirname(__file__) + '/bob-dylan-2019-04-13.html', 'r').read(),
         lxml.etree.HTMLParser()
     )
 
-
     @pytest.fixture
     def parsed_bob(self):
         return main.parse_act_page(self.bobpage)
+
+
+
+class TestParseActPage(WithBobPage):
 
     def test_has_stage(self, parsed_bob):
         assert parsed_bob['stage'] == 'Orange'
@@ -84,7 +89,7 @@ class TestParseActPAge(object):
         assert parsed_bob['date'] == datetime.date(2019, 7, 3)
 
 
-class TestCompleteItem(object):
+class TestCompleteItem(WithBobPage):
 
     def test_complete_bob(self):
         ret = main.complete_item(self.bob)
