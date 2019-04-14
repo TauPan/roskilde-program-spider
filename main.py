@@ -46,6 +46,12 @@ def get_parsed(url):
         session.get(url).text,
         lxml.etree.HTMLParser())
 
+def complete_item(item):
+    key, parsed_item = parse_main_item(item)
+    page = parse_act_page(get_parsed(parsed_item['link']))
+    parsed_item.update(page)
+    return key, parsed_item
+
 def parse_main_item(item):
     getlink = lxml.cssselect.CSSSelector('a')
     a = getlink(item)[0]
