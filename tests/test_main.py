@@ -91,6 +91,8 @@ class TestParseActPage(WithBobPage):
 
 class TestCompleteItem(WithBobPage):
 
-    def test_complete_bob(self):
-        ret = main.complete_item(self.bob)
-        assert ret['stage'] == 'Orange'
+    def test_complete_bob(self, mocker, parsed_bob):
+        mocker.patch('main.get_parsed', return_value=self.bobpage)
+        key, val = main.complete_item(self.bob)
+        assert key == BOBKEY
+        assert val['stage'] == 'Orange'
