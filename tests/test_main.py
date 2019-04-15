@@ -81,6 +81,9 @@ def _assert_bob(bob):
         links['Website']
         == 'https://www.bobdylan.com/')
     _date_assert(bob['date'], '2019-07-03')
+    assert (bob['tagline']
+            == 'The iconic singer-songwriter, who changed the world, '
+            'will play Roskilde Festival 2019')
 
 def _date_assert(dat, isostr):
     if hasattr(dat, 'isoformat'):
@@ -101,6 +104,8 @@ def _assert_shambs(shambs):
     assert 'links' not in shambs
     dat = shambs['date']
     _date_assert(dat, '2019-07-01')
+    assert (shambs['tagline']
+            == 'Street trap rap with four sharp representatives. Expect chaos!')
 
 class TestMain(object):
 
