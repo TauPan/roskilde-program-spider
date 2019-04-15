@@ -84,6 +84,7 @@ def _assert_bob(bob):
     assert (bob['tagline']
             == 'The iconic singer-songwriter, who changed the world, '
             'will play Roskilde Festival 2019')
+    assert bob['data-filters'] == '0 1595'
 
 def _date_assert(dat, isostr):
     if hasattr(dat, 'isoformat'):
@@ -106,6 +107,7 @@ def _assert_shambs(shambs):
     _date_assert(dat, '2019-07-01')
     assert (shambs['tagline']
             == 'Street trap rap with four sharp representatives. Expect chaos!')
+    assert shambs['data-filters'] == '0 1595'
 
 class TestMain(object):
 
