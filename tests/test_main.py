@@ -67,7 +67,7 @@ class TestBandlist(object):
         )
 
     @pytest.fixture
-    def parsed_bandlist(self, bandlist):
+    def parsed_bandlist(self, bandlist, get_parsed):
         return main.bandlist(bandlist)
 
     def test_returns_bandlist(self, parsed_bandlist):
