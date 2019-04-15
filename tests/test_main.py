@@ -55,6 +55,7 @@ def _assert_bob(bob):
     assert bob['stage'] == 'Orange'
     assert bob['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
     assert bob['country'] == 'US'
+    assert 'links' in bob
 
 class TestMain(object):
 
