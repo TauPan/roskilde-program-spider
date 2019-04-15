@@ -7,8 +7,6 @@ import re
 
 import main
 
-BOBKEY = 'BOB DYLAN WITH HIS BAND'
-
 
 @pytest.fixture(autouse=True)
 def prevent_requests(mocker):
@@ -50,6 +48,9 @@ def get_parsed(mocker, request):
     mocker.patch('main.get_parsed', side_effect=_get)
 
 
+BOBKEY = 'BOB DYLAN WITH HIS BAND'
+
+
 def _assert_bob(bob):
     """Common assertions about "A strange young man called Dylan"
     """
@@ -86,6 +87,10 @@ def _date_assert(dat, isostr):
     else:
         assert dat == isostr
 
+
+SHAMBSKEY = "SHAMBS X FARLI' X B WOOD$ X BRACY DOLL"
+
+
 def _assert_shambs(shambs):
     """Common assertions about "SHAMBS X FARLI' X B WOOD$ X BRACY DOLL"
     """
@@ -106,6 +111,7 @@ class TestMain(object):
         bob = data[BOBKEY]
         _assert_bob(bob)
         assert bob['date'] == '2019-07-03'
+        _assert_shambs(data[SHAMBSKEY])
 
 class TestGetMain(object):
 
@@ -115,6 +121,7 @@ class TestGetMain(object):
         bob = data[BOBKEY]
         _assert_bob(bob)
         assert bob['date'] == datetime.date(2019, 7, 3)
+        _assert_shambs(data[SHAMBSKEY])
 
 class TestBandlist(object):
 
@@ -144,6 +151,9 @@ class TestBandlist(object):
         bob = parsed_bandlist[BOBKEY]
         _assert_bob(bob)
         assert bob['date'] == datetime.date(2019, 7, 3)
+
+    def test_shambs_properties(self, parsed_bandlist):
+        _assert_shambs(parsed_bandlist[SHAMBSKEY])
 
 
 class WithBob(object):
