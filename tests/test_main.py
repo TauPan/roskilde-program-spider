@@ -80,6 +80,22 @@ def _assert_bob(bob):
         links['Website']
         == 'https://www.bobdylan.com/')
 
+def _date_assert(dat, isostr):
+    if hasattr(dat, 'isoformat'):
+        assert dat.isoformat() == isostr
+    else:
+        assert dat == isostr
+
+def _assert_shambs(shambs):
+    """Common assertions about "SHAMBS X FARLI' X B WOOD$ X BRACY DOLL"
+    """
+    assert shambs['stage'] == 'Countdown'
+    assert shambs['link'] == '/en/years/2019/acts/shambs-x-farli-x-b-wood-x-bracy-doll/'
+    assert shambs['country'] == 'DK'
+    assert 'links' not in shambs
+    dat = shambs['date']
+    _date_assert(dat, '2019-07-01')
+
 class TestMain(object):
 
     def test_returns_string(self, get_parsed):
