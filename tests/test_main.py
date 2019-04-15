@@ -56,6 +56,9 @@ class TestMain(object):
         assert type(ret) == str
         data = json.loads(ret)
         assert data
+        bob = data[BOBKEY]
+        assert bob['stage'] == 'Orange'
+        assert bob['date'] == datetime.date(2019, 7, 3)
 
 class TestBandlist(object):
 
