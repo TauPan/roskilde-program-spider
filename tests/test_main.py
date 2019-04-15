@@ -38,7 +38,7 @@ def get_parsed(mocker, request):
     def _get(url):
         file = config['default']
         for k in config['mappings']:
-            if re.fullmatch(k, url):
+            if re.search(k, url):
                 file = config['mappings'][k]
                 break
         file = '{}/{}'.format(basedir, file)
@@ -58,7 +58,7 @@ class TestMain(object):
         assert data
         bob = data[BOBKEY]
         assert bob['stage'] == 'Orange'
-        assert bob['date'] == datetime.date(2019, 7, 3)
+        assert bob['date'] == '2019-07-03'
 
 class TestGetMain(object):
 
