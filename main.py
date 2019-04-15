@@ -74,18 +74,19 @@ def parse_act_page(item):
     getinfo = lxml.cssselect.CSSSelector('div[class="info"]')
     getblocks = lxml.cssselect.CSSSelector('div[class="block"]')
     blocks = getblocks(getinfo(item)[0])
-    return {
+    ret = {
         'stage': blocks[0].xpath('text()')[0],
         'date': dateutil.parser.parse(
-                blocks[1]
-                .xpath('*//text()')
-                [1]).date(),
-        'links': {
+            blocks[1]
+            .xpath('*//text()')
+            [1]).date()
+    }
+    if len(blocks) > 2:
+        ret['links'] = {
             a.text: a.attrib['href']
             for a in blocks[2].findall('a')
         }
-    }
-
+    return ret
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
