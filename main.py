@@ -82,7 +82,7 @@ def parse_act_page(item):
                 [1]).date(),
         'links': {
             a.text: a.attrib['href']
-            for a in blocks[2].find('a')
+            for a in blocks[2].findall('a')
         }
     }
 
