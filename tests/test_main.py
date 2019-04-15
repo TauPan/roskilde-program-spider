@@ -56,6 +56,28 @@ def _assert_bob(bob):
     assert bob['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
     assert bob['country'] == 'US'
     assert 'links' in bob
+    links = bob['links']
+    assert set(links.keys()) == {
+        'Spotify', 'Facebook', 'Twitter', 'Instagram', 'Youtube', 'Website'
+    }
+    assert (
+        links['Spotify']
+        == 'https://open.spotify.com/track/3AhXZa8sUQht0UEdBJgpGc?si=FIvHuowIQVWS-memeplwHA')
+    assert (
+        links['Facebook']
+        == 'https://www.facebook.com/bobdylan/')
+    assert (
+        links['Twitter']
+        == 'https://twitter.com/bobdylan')
+    assert (
+        links['Instagram']
+        == 'https://www.instagram.com/bobdylan/')
+    assert (
+        links['Youtube']
+        == 'https://www.youtube.com/channel/UCnRI0ay61tY-fKYzzB3fCnw')
+    assert (
+        links['Website']
+        == 'https://www.bobdylan.com/')
 
 class TestMain(object):
 
