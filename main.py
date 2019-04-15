@@ -8,6 +8,7 @@
 
 import datetime
 import dateutil.parser
+import json
 import os
 import sys
 import urllib
@@ -23,7 +24,7 @@ HOSTURL = urllib.parse.urlunsplit(
 SESSION = None
 
 def main(argv):
-    return '[true]'
+    return json.dumps(get_main())
 
 def get_main():
     with requests.Session() as session:
