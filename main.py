@@ -67,7 +67,8 @@ def parse_main_item(item):
     getcountry = lxml.cssselect.CSSSelector(
         'div[class="item-meta"] > div[class="country"]')
     return key, {'link': a.attrib['href'],
-                 'country': getcountry(a)[0].text}
+                 'country': getcountry(a)[0].text,
+                 'data-filters': item.xpath('..')[0].attrib['data-filters']}
 
 
 def parse_act_page(item):
