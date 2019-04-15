@@ -80,6 +80,7 @@ def _assert_bob(bob):
     assert (
         links['Website']
         == 'https://www.bobdylan.com/')
+    _date_assert(bob['date'], '2019-07-03')
 
 def _date_assert(dat, isostr):
     if hasattr(dat, 'isoformat'):
@@ -110,7 +111,6 @@ class TestMain(object):
         assert data
         bob = data[BOBKEY]
         _assert_bob(bob)
-        assert bob['date'] == '2019-07-03'
         _assert_shambs(data[SHAMBSKEY])
 
 class TestGetMain(object):
@@ -120,7 +120,6 @@ class TestGetMain(object):
         assert data
         bob = data[BOBKEY]
         _assert_bob(bob)
-        assert bob['date'] == datetime.date(2019, 7, 3)
         _assert_shambs(data[SHAMBSKEY])
 
 class TestBandlist(object):
@@ -150,7 +149,6 @@ class TestBandlist(object):
     def test_bob_properties(self, parsed_bandlist):
         bob = parsed_bandlist[BOBKEY]
         _assert_bob(bob)
-        assert bob['date'] == datetime.date(2019, 7, 3)
 
     def test_shambs_properties(self, parsed_bandlist):
         _assert_shambs(parsed_bandlist[SHAMBSKEY])
