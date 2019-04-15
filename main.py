@@ -86,6 +86,11 @@ def parse_act_page(item):
             a.text: a.attrib['href']
             for a in blocks[2].findall('a')
         }
+    getheader = lxml.cssselect.CSSSelector(
+        'div.TextModule div.inner div.copy h6')
+    header = getheader(item)
+    if header:
+        ret['tagline'] = header[0].xpath('text()|*//text()')[0]
     return ret
 
 if __name__ == "__main__":
