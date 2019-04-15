@@ -77,3 +77,7 @@ def parse_act_page(item):
                 .xpath('*//text()')
                 [1]).date()
     }
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
