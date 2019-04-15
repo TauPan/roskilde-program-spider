@@ -30,7 +30,8 @@ def get_parsed(mocker, request):
     default_default = 'bob-dylan-2019-04-13.html'
     default_mappings = {
         r'/line-up/$': 'line-up-2019-04-13.html',
-        r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html'
+        r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html',
+        r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': 'shambs-2019-04-15.html'
     }
     config = getattr(request, 'param', {})
     config.setdefault('default', default_default)
