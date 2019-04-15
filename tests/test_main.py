@@ -60,6 +60,15 @@ class TestMain(object):
         assert bob['stage'] == 'Orange'
         assert bob['date'] == datetime.date(2019, 7, 3)
 
+class TestGetMain(object):
+
+    def test_returns_data(self, get_parsed):
+        data = main.get_main()
+        assert data
+        bob = data[BOBKEY]
+        assert bob['stage'] == 'Orange'
+        assert bob['date'] == datetime.date(2019, 7, 3)
+
 class TestBandlist(object):
 
     @pytest.fixture
