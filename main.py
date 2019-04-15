@@ -79,7 +79,11 @@ def parse_act_page(item):
         'date': dateutil.parser.parse(
                 blocks[1]
                 .xpath('*//text()')
-                [1]).date()
+                [1]).date(),
+        'links': {
+            a.text: a.attrib['href']
+            for a in blocks[2].find('a')
+        }
     }
 
 
