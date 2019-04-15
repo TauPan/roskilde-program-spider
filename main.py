@@ -24,7 +24,9 @@ HOSTURL = urllib.parse.urlunsplit(
 SESSION = None
 
 def main(argv):
-    return json.dumps(get_main(), default=lambda x: x.isoformat())
+    ret = json.dumps(get_main(), default=lambda x: x.isoformat())
+    print(ret)
+    return ret
 
 def get_main():
     with requests.Session() as session:
