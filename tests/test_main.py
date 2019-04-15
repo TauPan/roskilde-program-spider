@@ -109,6 +109,7 @@ def _assert_shambs(shambs):
             == 'Street trap rap with four sharp representatives. Expect chaos!')
     assert shambs['data-filters'] == '0 1595'
 
+
 class TestMain(object):
 
     def test_returns_string(self, get_parsed):
@@ -120,6 +121,7 @@ class TestMain(object):
         _assert_bob(bob)
         _assert_shambs(data[SHAMBSKEY])
 
+
 class TestGetMain(object):
 
     def test_returns_data(self, get_parsed):
@@ -128,6 +130,7 @@ class TestGetMain(object):
         bob = data[BOBKEY]
         _assert_bob(bob)
         _assert_shambs(data[SHAMBSKEY])
+
 
 class TestBandlist(object):
 
