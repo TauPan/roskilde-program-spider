@@ -3,6 +3,7 @@ import json
 import lxml.etree
 import os
 import pytest
+import re
 
 import main
 
@@ -13,9 +14,44 @@ BOBKEY = 'BOB DYLAN WITH HIS BAND'
 def prevent_requests(mocker):
     mocker.patch('main.requests')
 
+
+@pytest.fixture
+def get_parsed(mocker, request):
+    """Takes as parameters a dictionary of
+
+    - mappings: A dictionary of regexes mapped to content files to
+      parse as html content. All files are searched underneath the
+      directory this test file resides in.
+
+    - default: A filename for the default content if no mapping is found
+
+    """
+    basedir = os.path.dirname(__file__)
+    default_default = 'bob-dylan-2019-04-13.html'
+    default_mappings = {
+        r'/line-up/$': 'line-up-2019-04-13.html',
+        r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html'
+    }
+    config = getattr(request, 'param', {})
+    config.setdefault('default', default_default)
+    config.setdefault('mappings', default_mappings)
+    def _get(url):
+        file = config['default']
+        for k in config['mappings']:
+            if re.fullmatch(k, url):
+                file = config['mappings'][k]
+                break
+        file = '{}/{}'.format(basedir, file)
+        return lxml.etree.fromstring(
+            open(file, 'r').read(),
+            lxml.etree.HTMLParser()
+        )
+    mocker.patch('main.get_parsed', side_effect=_get)
+
+
 class TestMain(object):
 
-    def test_returns_string(self):
+    def test_returns_string(self, get_parsed):
         ret = main.main([])
         assert type(ret) == str
         data = json.loads(ret)
@@ -96,8 +132,7 @@ class TestParseActPage(WithBobPage):
 
 class TestCompleteItem(WithBobPage):
 
-    def test_complete_bob(self, mocker, parsed_bob):
-        mocker.patch('main.get_parsed', return_value=self.bobpage)
+    def test_complete_bob(self, mocker, get_parsed):
         key, val = main.complete_item(self.bob)
         assert key == BOBKEY
         assert val['stage'] == 'Orange'
