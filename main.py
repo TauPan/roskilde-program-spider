@@ -10,12 +10,15 @@ import datetime
 import dateutil.parser
 import os
 import sys
+import urllib
 
 import lxml.cssselect
 import lxml.etree
 import requests
 
 BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
+HOSTURL = urllib.parse.urlunsplit(
+    (lambda u: (u[0], u[1], '', '', ''))(urllib.parse.urlsplit(BASEURL)))
 
 SESSION = None
 
@@ -30,7 +33,7 @@ def get_main():
 
 def bandlist(overview):
     getbands = lxml.cssselect.CSSSelector('div[class="item-inner"]')
-    bands = dict(parse_main_item(i)
+    bands = dict(complete_item(i)
                  for i in getbands(overview))
     return bands
 
@@ -48,7 +51,7 @@ def get_parsed(url):
 
 def complete_item(item):
     key, parsed_item = parse_main_item(item)
-    page = parse_act_page(get_parsed(parsed_item['link']))
+    page = parse_act_page(get_parsed(HOSTURL + '/' + parsed_item['link']))
     parsed_item.update(page)
     return key, parsed_item
 
