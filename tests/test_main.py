@@ -49,6 +49,13 @@ def get_parsed(mocker, request):
     mocker.patch('main.get_parsed', side_effect=_get)
 
 
+def _assert_bob(bob):
+    """Common assertions about "A strange young man called Dylan"
+    """
+    assert bob['stage'] == 'Orange'
+    assert bob['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
+    assert bob['country'] == 'US'
+
 class TestMain(object):
 
     def test_returns_string(self, get_parsed):
@@ -57,7 +64,7 @@ class TestMain(object):
         data = json.loads(ret)
         assert data
         bob = data[BOBKEY]
-        assert bob['stage'] == 'Orange'
+        _assert_bob(bob)
         assert bob['date'] == '2019-07-03'
 
 class TestGetMain(object):
@@ -66,7 +73,7 @@ class TestGetMain(object):
         data = main.get_main()
         assert data
         bob = data[BOBKEY]
-        assert bob['stage'] == 'Orange'
+        _assert_bob(bob)
         assert bob['date'] == datetime.date(2019, 7, 3)
 
 class TestBandlist(object):
@@ -85,8 +92,8 @@ class TestBandlist(object):
     def test_returns_bandlist(self, parsed_bandlist):
         ret = parsed_bandlist
         # assuming we have a dictionary by band name
-        bob = BOBKEY
-        assert bob in ret
+        assert BOBKEY in ret
+        _assert_bob(ret[BOBKEY])
         # first attempts only went until "Zeitkratzer" omitting the
         # warm-up acts
         assert len(ret) > 150
@@ -95,7 +102,7 @@ class TestBandlist(object):
 
     def test_bob_properties(self, parsed_bandlist):
         bob = parsed_bandlist[BOBKEY]
-        assert bob['stage'] == 'Orange'
+        _assert_bob(bob)
         assert bob['date'] == datetime.date(2019, 7, 3)
 
 
@@ -115,11 +122,10 @@ BOB DYLAN WITH HIS BAND
 class TestParseMainItem(WithBob):
 
     def test_has_key(self):
-        key, val = main.parse_main_item(self.bob)
+        key, bob = main.parse_main_item(self.bob)
         assert key == BOBKEY
-        assert val['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
-        assert val['country'] == 'US'
-
+        assert bob['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
+        assert bob['country'] == 'US'
 
 class WithBobPage(WithBob):
     bobpage = lxml.etree.fromstring(
@@ -145,6 +151,6 @@ class TestParseActPage(WithBobPage):
 class TestCompleteItem(WithBobPage):
 
     def test_complete_bob(self, mocker, get_parsed):
-        key, val = main.complete_item(self.bob)
+        key, bob = main.complete_item(self.bob)
         assert key == BOBKEY
-        assert val['stage'] == 'Orange'
+        _assert_bob(bob)
