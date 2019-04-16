@@ -1,4 +1,5 @@
 import datetime
+import io
 import json
 import lxml.etree
 import os
@@ -121,7 +122,7 @@ def _assert_zusa(zusa):
 """
     comp = dict(zusa)
     comp['date'] = _date_iso(comp['date'])
-    comp['article'] = lxml.etree.fromstring(comp['article'])
+    comp['article'] = _normalize_html(comp['article'])
     expected = {
         'stage': 'Art Zone',
         'date': '2019-07-03',
@@ -134,12 +135,18 @@ def _assert_zusa(zusa):
             'Instagram': 'https://www.instagram.com/zusastreet/',
             'Website': 'http://zusastreet.dk/'
         },
-        'article': lxml.etree.fromstring(
-            open(os.path.dirname(__file__)
-                 + '/zusa-2019-04-16-article.html', 'r').read(),
-            lxml.etree.HTMLParser())
+        'article': _normalize_html(
+                open(os.path.dirname(__file__)
+                     + '/zusa-2019-04-16-article.html', 'r').read())
     }
     assert comp == expected
+
+
+def _normalize_html(s):
+    return lxml.etree.tostring(
+        lxml.etree.fromstring(s,
+                              lxml.etree.HTMLParser())).decode('utf-8')
+
 
 class TestMain(object):
 
