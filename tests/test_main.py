@@ -29,7 +29,8 @@ def get_parsed(mocker, request):
     default_mappings = {
         r'/line-up/$': 'line-up-2019-04-13.html',
         r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html',
-        r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': 'shambs-2019-04-15.html'
+        r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': 'shambs-2019-04-15.html',
+        r'/acts/zusa/$': 'zusa-2019-04-16.html',
     }
     config = getattr(request, 'param', {})
     config.setdefault('default', default_default)
@@ -118,7 +119,9 @@ ZUSAKEY = "ZUSA"
 def _assert_zusa(zusa):
     """Common assertions about "ZUSA"
 """
-    assert zusa == {
+    comp = dict(zusa)
+    comp['date'] = _date_iso(comp['date'])
+    assert comp == {
         'stage': 'Art Zone',
         'date': '2019-07-03',
         'tagline': 'Meet up at ZUSA and become part of the community',
