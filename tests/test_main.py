@@ -121,7 +121,8 @@ def _assert_zusa(zusa):
 """
     comp = dict(zusa)
     comp['date'] = _date_iso(comp['date'])
-    assert comp == {
+    comp['article'] = lxml.etree.fromstring(comp['article'])
+    expected = {
         'stage': 'Art Zone',
         'date': '2019-07-03',
         'tagline': 'Meet up at ZUSA and become part of the community',
@@ -132,8 +133,13 @@ def _assert_zusa(zusa):
             'Facebook': 'https://www.facebook.com/zusa.street',
             'Instagram': 'https://www.instagram.com/zusastreet/',
             'Website': 'http://zusastreet.dk/'
-        }
+        },
+        'article': lxml.etree.fromstring(
+            open(os.path.dirname(__file__)
+                 + '/zusa-2019-04-16-article.html', 'r').read(),
+            lxml.etree.HTMLParser())
     }
+    assert comp == expected
 
 class TestMain(object):
 
