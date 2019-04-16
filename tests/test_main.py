@@ -110,6 +110,26 @@ def _assert_shambs(shambs):
     assert shambs['data-filters'] == ['Music']
 
 
+ZUSAKEY = "ZUSA"
+
+
+def _assert_zusa(zusa):
+    """Common assertions about "ZUSA"
+"""
+    assert zusa == {
+        'stage': 'Art Zone',
+        'date': '2019-07-03',
+        'tagline': 'Meet up at ZUSA and become part of the community',
+        'country': 'DK',
+        'link': '/en/years/2019/acts/zusa/',
+        'data-filters': ['Arts & Activism'],
+        'links': {
+            'Facebook': 'https://www.facebook.com/zusa.street',
+            'Instagram': 'https://www.instagram.com/zusastreet/',
+            'Website': 'http://zusastreet.dk/'
+        }
+    }
+
 class TestMain(object):
 
     def test_returns_string(self, get_parsed):
@@ -120,6 +140,7 @@ class TestMain(object):
         bob = data[BOBKEY]
         _assert_bob(bob)
         _assert_shambs(data[SHAMBSKEY])
+        _assert_zusa(data[ZUSAKEY])
 
 
 class TestGetMain(object):
@@ -130,6 +151,7 @@ class TestGetMain(object):
         bob = data[BOBKEY]
         _assert_bob(bob)
         _assert_shambs(data[SHAMBSKEY])
+        _assert_zusa(data[ZUSAKEY])
 
 
 class TestBandlist(object):
@@ -162,6 +184,9 @@ class TestBandlist(object):
 
     def test_shambs_properties(self, parsed_bandlist):
         _assert_shambs(parsed_bandlist[SHAMBSKEY])
+
+    def test_zusa_properties(self, parsed_bandlist):
+        _assert_zusa(parsed_bandlist[ZUSAKEY])
 
 
 class WithBob(object):
