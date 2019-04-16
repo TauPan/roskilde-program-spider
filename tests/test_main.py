@@ -165,16 +165,18 @@ class TestBandlist(object):
 
 
 class WithBob(object):
-    bob = lxml.etree.fromstring(
-        b'''<div class="item-inner">
+    bobbase = b'''<div class="PosterViewModuleItem item p1" data-sorting="1" data-hover="/media/2499/bob-dylan.png" data-artist="2018002790" data-filters="0 1595">
+<div class="item-inner">
 <a href="/en/years/2019/acts/bob-dylan-with-his-band/" class="name OutlineAnchorPosterComp">
 BOB DYLAN WITH HIS BAND
 <div class="item-meta">
 <div class="country">US</div>
-<div class="favorit" data-artist-id="2018002790"/>
+<div class="favorit" data-artist-id="2018002790"></div>
 </div>
 </a>
-</div>''')
+</div>
+</div>'''
+    bob = lxml.etree.fromstring(bobbase).xpath('div[@class="item-inner"]')[0]
 
 
 class TestParseMainItem(WithBob):
