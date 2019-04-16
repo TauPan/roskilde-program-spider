@@ -87,11 +87,13 @@ def _assert_bob(bob):
     assert bob['data-filters'] == ['Music']
 
 def _date_assert(dat, isostr):
-    if hasattr(dat, 'isoformat'):
-        assert dat.isoformat() == isostr
-    else:
-        assert dat == isostr
+    assert _date_iso(dat) == isostr
 
+def _date_iso(dat):
+    if hasattr(dat, 'isoformat'):
+        return dat.isoformat()
+    else:
+        return dat
 
 SHAMBSKEY = "SHAMBS X FARLI' X B WOOD$ X BRACY DOLL"
 
