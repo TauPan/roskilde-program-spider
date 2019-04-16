@@ -60,6 +60,7 @@ def complete_item(item):
     parsed_item.update(page)
     return key, parsed_item
 
+
 def parse_main_item(item):
     getlink = lxml.cssselect.CSSSelector('a')
     a = getlink(item)[0]
@@ -68,7 +69,11 @@ def parse_main_item(item):
         'div[class="item-meta"] > div[class="country"]')
     return key, {'link': a.attrib['href'],
                  'country': getcountry(a)[0].text,
-                 'data-filters': item.xpath('..')[0].attrib['data-filters']}
+                 'data-filters': get_data_filters(item)}
+
+
+def get_data_filters(item):
+    return item.xpath('..')[0].attrib['data-filters']
 
 
 def parse_act_page(item):
