@@ -73,7 +73,16 @@ def parse_main_item(item):
 
 
 def get_data_filters(item):
-    return item.xpath('..')[0].attrib['data-filters']
+    words = {
+        '1595': 'Music',
+        '2685': 'Arts & Activism'
+    }
+    items = item.xpath('..')[0].attrib['data-filters'].split()
+    ret = []
+    for k in items:
+        if k in words:
+            ret.append(words[k])
+    return ret
 
 
 def parse_act_page(item):
