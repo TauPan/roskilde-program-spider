@@ -40,14 +40,14 @@ def bandlist(overview):
     return bands
 
 
-SESSION = None
+class session(object):
 
+    SESSION = None
 
-def session():
-    global SESSION
-    if SESSION is None:
-        SESSION = requests.Session()
-    return SESSION
+    def __init__(self, *args, **kwargs):
+        if session.SESSION is None:
+            session.SESSION = requests.Session(*args, **kwargs)
+            self.__dict__.update(self.SESSION.__dict__)
 
 
 def get_parsed(url):
