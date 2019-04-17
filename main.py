@@ -77,25 +77,36 @@ def parse_act_page(item):
     blocks = item.xpath('.//div[@class="info"]/div[@class="block"]')
     ret = {
         'stage': blocks[0].xpath('text()')[0],
-        'date': dateutil.parser.parse(
-            blocks[1]
-            .xpath('*//text()')
-            [1]).date()
+        'date': get_date(blocks)
     }
+    set_links(ret, blocks)
+    set_tagline(ret, item)
+    ret['article'] = get_article(item)
+    return ret
+
+
+def get_date(blocks):
+    return dateutil.parser.parse(
+        blocks[1]
+        .xpath('*//text()')
+        [1]).date()
+
+def set_links(dct, blocks):
     if len(blocks) > 2:
-        ret['links'] = {
+        dct['links'] = {
             a.text: a.attrib['href']
             for a in blocks[2].findall('a')
         }
+
+
+def set_tagline(dct, item):
     header = item.xpath(
         './/div[@class="TextModule"]'
         '/div[@class="inner"]'
         '/div[@class="copy"]'
         '/h6')
     if header:
-        ret['tagline'] = header[0].xpath('text()|*//text()')[0]
-    ret['article'] = get_article(item)
-    return ret
+        dct['tagline'] = header[0].xpath('text()|*//text()')[0]
 
 
 def get_data_filters(item):
