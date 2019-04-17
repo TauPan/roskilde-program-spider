@@ -79,8 +79,8 @@ def parse_act_page(item):
         'stage': blocks[0].xpath('text()')[0],
         'date': get_date(blocks)
     }
-    set_links(ret, blocks)
     set_tagline(ret, item)
+    set_links(ret, blocks)
     ret['article'] = get_article(item)
     return ret
 
