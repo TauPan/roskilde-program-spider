@@ -13,7 +13,6 @@ import os
 import sys
 import urllib
 
-import lxml.cssselect
 import lxml.etree
 import requests
 
@@ -37,9 +36,8 @@ def get_main():
         return bandlist(overview)
 
 def bandlist(overview):
-    getbands = lxml.cssselect.CSSSelector('div[class="item-inner"]')
     bands = dict(complete_item(i)
-                 for i in getbands(overview))
+                 for i in overview.xpath('.//div[@class="item-inner"]'))
     return bands
 
 def get_session():
@@ -62,14 +60,13 @@ def complete_item(item):
 
 
 def parse_main_item(item):
-    getlink = lxml.cssselect.CSSSelector('a')
-    a = getlink(item)[0]
+    a = item.xpath('a')[0]
     key = a.text.strip()
-    getcountry = lxml.cssselect.CSSSelector(
-        'div[class="item-meta"] > div[class="country"]')
-    return key, {'link': a.attrib['href'],
-                 'country': getcountry(a)[0].text,
-                 'data-filters': get_data_filters(item)}
+    return key, {
+        'link': a.attrib['href'],
+        'country': a.xpath(
+            'div[@class="item-meta"]/div[@class="country"]')[0].text,
+        'data-filters': get_data_filters(item)}
 
 
 def get_data_filters(item):
@@ -86,9 +83,7 @@ def get_data_filters(item):
 
 
 def parse_act_page(item):
-    getinfo = lxml.cssselect.CSSSelector('div[class="info"]')
-    getblocks = lxml.cssselect.CSSSelector('div[class="block"]')
-    blocks = getblocks(getinfo(item)[0])
+    blocks = item.xpath('.//div[@class="info"]/div[@class="block"]')
     ret = {
         'stage': blocks[0].xpath('text()')[0],
         'date': dateutil.parser.parse(
@@ -101,9 +96,8 @@ def parse_act_page(item):
             a.text: a.attrib['href']
             for a in blocks[2].findall('a')
         }
-    getheader = lxml.cssselect.CSSSelector(
-        'div.TextModule div.inner div.copy h6')
-    header = getheader(item)
+    header = item.xpath(
+        './/div[@class="TextModule"]/div[@class="inner"]/div[@class="copy"]/h6')
     if header:
         ret['tagline'] = header[0].xpath('text()|*//text()')[0]
     ret['article'] = get_article(item)

@@ -16,7 +16,6 @@ flake8 = "*"
 [packages]
 requests = "*"
 lxml = "*"
-cssselect = "*"
 python-dateutil = "*"
 
 [requires]
