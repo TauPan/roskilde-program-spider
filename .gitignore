@@ -29,3 +29,4 @@ core
 *.pyc
 /.coverage
 /htmlcov
+/.testmondata
