@@ -115,11 +115,9 @@ def get_data_filters(item):
         '2685': 'Arts & Activism'
     }
     items = item.xpath('..')[0].attrib['data-filters'].split()
-    ret = []
-    for k in items:
-        if k in words:
-            ret.append(words[k])
-    return ret
+    return [words[k]
+            for k in items
+            if k in words]
 
 
 def get_article(item):
