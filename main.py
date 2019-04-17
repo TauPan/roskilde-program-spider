@@ -30,6 +30,7 @@ def main(argv):
     return ret
 
 def get_main():
+    global SESSION
     with requests.Session() as session:
         SESSION = session
         overview = get_parsed(BASEURL)
@@ -97,7 +98,10 @@ def parse_act_page(item):
             for a in blocks[2].findall('a')
         }
     header = item.xpath(
-        './/div[@class="TextModule"]/div[@class="inner"]/div[@class="copy"]/h6')
+        './/div[@class="TextModule"]'
+        '/div[@class="inner"]'
+        '/div[@class="copy"]'
+        '/h6')
     if header:
         ret['tagline'] = header[0].xpath('text()|*//text()')[0]
     ret['article'] = get_article(item)
