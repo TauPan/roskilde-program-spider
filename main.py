@@ -34,6 +34,12 @@ def get_main():
     return bandlist(overview)
 
 
+def get_parsed(url):
+    return lxml.etree.fromstring(
+        session().get(url).text,
+        lxml.etree.HTMLParser())
+
+
 def bandlist(overview):
     bands = dict(complete_item(i)
                  for i in overview.xpath('.//div[@class="item-inner"]'))
@@ -48,12 +54,6 @@ class session(object):
         if session.SESSION is None:
             session.SESSION = requests.Session(*args, **kwargs)
             self.__dict__.update(self.SESSION.__dict__)
-
-
-def get_parsed(url):
-    return lxml.etree.fromstring(
-        session().get(url).text,
-        lxml.etree.HTMLParser())
 
 
 def complete_item(item):
@@ -71,19 +71,6 @@ def parse_main_item(item):
         'country': a.xpath(
             'div[@class="item-meta"]/div[@class="country"]')[0].text,
         'data-filters': get_data_filters(item)}
-
-
-def get_data_filters(item):
-    words = {
-        '1595': 'Music',
-        '2685': 'Arts & Activism'
-    }
-    items = item.xpath('..')[0].attrib['data-filters'].split()
-    ret = []
-    for k in items:
-        if k in words:
-            ret.append(words[k])
-    return ret
 
 
 def parse_act_page(item):
@@ -108,6 +95,19 @@ def parse_act_page(item):
     if header:
         ret['tagline'] = header[0].xpath('text()|*//text()')[0]
     ret['article'] = get_article(item)
+    return ret
+
+
+def get_data_filters(item):
+    words = {
+        '1595': 'Music',
+        '2685': 'Arts & Activism'
+    }
+    items = item.xpath('..')[0].attrib['data-filters'].split()
+    ret = []
+    for k in items:
+        if k in words:
+            ret.append(words[k])
     return ret
 
 
