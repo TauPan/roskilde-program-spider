@@ -113,7 +113,10 @@ def parse_act_page(item):
 def get_article(item):
     return ''.join(
         lxml.etree.tostring(x).decode('utf-8')
-        for x in item.xpath('//div[contains(@class, "TextModule")]''|//div[contains(@class, "SpotifyModule")]''|//div[contains(@class, "MediaModule")]'))
+        for x in item.xpath(
+                '//div[contains(@class, "TextModule")]'
+                '|//div[contains(@class, "SpotifyModule")]'
+                '|//div[contains(@class, "MediaModule")]'))
 
 
 if __name__ == "__main__":
