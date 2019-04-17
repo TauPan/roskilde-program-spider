@@ -55,6 +55,9 @@ class session(object):
             session.SESSION = requests.Session(*args, **kwargs)
             self.__dict__.update(self.SESSION.__dict__)
 
+    def get(self, *args, **kwargs):
+        return session.SESSION.get(*args, **kwargs)
+
 
 def complete_item(item):
     key, parsed_item = parse_main_item(item)
