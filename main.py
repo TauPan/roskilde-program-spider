@@ -20,7 +20,6 @@ BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
 HOSTURL = urllib.parse.urlunsplit(
     (lambda u: (u[0], u[1], '', '', ''))(urllib.parse.urlsplit(BASEURL)))
 
-SESSION = None
 
 def main(argv):
     ret = json.dumps(get_main(),
@@ -29,29 +28,33 @@ def main(argv):
     print(ret)
     return ret
 
+
 def get_main():
-    global SESSION
-    with requests.Session() as session:
-        SESSION = session
-        overview = get_parsed(BASEURL)
-        return bandlist(overview)
+    overview = get_parsed(BASEURL)
+    return bandlist(overview)
+
 
 def bandlist(overview):
     bands = dict(complete_item(i)
                  for i in overview.xpath('.//div[@class="item-inner"]'))
     return bands
 
-def get_session():
+
+SESSION = None
+
+
+def session():
     global SESSION
     if SESSION is None:
         SESSION = requests.Session()
     return SESSION
 
+
 def get_parsed(url):
-    session = get_session()
     return lxml.etree.fromstring(
-        session.get(url).text,
+        session().get(url).text,
         lxml.etree.HTMLParser())
+
 
 def complete_item(item):
     key, parsed_item = parse_main_item(item)
