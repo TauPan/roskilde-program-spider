@@ -58,22 +58,33 @@ class session(object):
 
 
 def complete_item(item):
-    HOSTURL = urllib.parse.urlunsplit(
-        (lambda u: (u[0], u[1], '', '', ''))(urllib.parse.urlsplit(BASEURL)))
-    key, parsed_item = parse_main_item(item)
-    page = parse_act_page(get_parsed(HOSTURL + '/' + parsed_item['link']))
-    parsed_item.update(page)
-    return key, parsed_item
+    return BandListItem(item).parse()
 
 
-def parse_main_item(item):
-    a = item.xpath('a')[0]
-    key = a.text.strip()
-    return key, {
-        'link': a.attrib['href'],
-        'country': a.xpath(
-            'div[@class="item-meta"]/div[@class="country"]')[0].text,
-        'data-filters': get_data_filters(item)}
+class BandListItem(object):
+    def __init__(self, item):
+        self.item = item
+
+
+    def parse(self):
+        self.key, self.parsed_item = self.parse_main_item()
+        HOSTURL = urllib.parse.urlunsplit(
+            (lambda u: (u[0], u[1], '', '', ''))(urllib.parse.urlsplit(BASEURL)))
+        page = parse_act_page(get_parsed(HOSTURL
+                                         + '/'
+                                         + self.parsed_item['link']))
+        self.parsed_item.update(page)
+        return self.key, self.parsed_item
+
+
+    def parse_main_item(self):
+        a = self.item.xpath('a')[0]
+        key = a.text.strip()
+        return key, {
+            'link': a.attrib['href'],
+            'country': a.xpath(
+                'div[@class="item-meta"]/div[@class="country"]')[0].text,
+            'data-filters': get_data_filters(self.item)}
 
 
 def parse_act_page(item):
