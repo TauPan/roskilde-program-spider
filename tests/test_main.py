@@ -55,6 +55,19 @@ def filename_here(fil):
     return '{}/{}'.format(os.path.dirname(__file__), fil)
 
 
+class TestMain(object):
+
+    def test_returns_string(self, get_parsed):
+        ret = main.main([])
+        assert type(ret) == str
+        data = json.loads(ret)
+        assert data
+        bob = data[BOBKEY]
+        _assert_bob(bob)
+        _assert_shambs(data[SHAMBSKEY])
+        _assert_zusa(data[ZUSAKEY])
+
+
 BOBKEY = 'BOB DYLAN WITH HIS BAND'
 
 
@@ -157,19 +170,6 @@ def _normalize_html(s):
     return lxml.etree.tostring(
         lxml.etree.fromstring(s,
                               lxml.etree.HTMLParser())).decode('utf-8')
-
-
-class TestMain(object):
-
-    def test_returns_string(self, get_parsed):
-        ret = main.main([])
-        assert type(ret) == str
-        data = json.loads(ret)
-        assert data
-        bob = data[BOBKEY]
-        _assert_bob(bob)
-        _assert_shambs(data[SHAMBSKEY])
-        _assert_zusa(data[ZUSAKEY])
 
 
 class TestGetMain(object):
