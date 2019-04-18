@@ -84,63 +84,69 @@ class BandListItem(object):
             'link': a.attrib['href'],
             'country': a.xpath(
                 'div[@class="item-meta"]/div[@class="country"]')[0].text,
-            'data-filters': get_data_filters(self.item)}
+            'data-filters': self.get_data_filters()}
+
+    def get_data_filters(self):
+        words = {
+            '1595': 'Music',
+            '2685': 'Arts & Activism'
+        }
+        items = self.item.xpath('..')[0].attrib['data-filters'].split()
+        return [words[k]
+                for k in items
+                if k in words]
 
 
 def parse_act_page(item):
-    blocks = item.xpath('.//div[@class="info"]/div[@class="block"]')
-    ret = {
-        'stage': blocks[0].xpath('text()')[0],
-        'date': get_date(blocks)
-    }
-    set_tagline(ret, item)
-    set_links(ret, blocks)
-    ret['article'] = get_article(item)
-    return ret
+    return ActPage(item).parse()
 
+class ActPage(object):
 
-def get_date(blocks):
-    return dateutil.parser.parse(
-        blocks[1]
-        .xpath('*//text()')
-        [1]).date()
+    def __init__(self, item):
+        self.item = item
 
-def set_links(dct, blocks):
-    if len(blocks) > 2:
-        dct['links'] = {
-            a.text: a.attrib['href']
-            for a in blocks[2].findall('a')
+    def parse(self):
+        self.blocks = self.item.xpath('.//div[@class="info"]/div[@class="block"]')
+        ret = {
+            'stage': self.blocks[0].xpath('text()')[0],
+            'date': self.get_date()
         }
+        self.set_tagline(ret)
+        self.set_links(ret)
+        ret['article'] = self.get_article()
+        return ret
 
 
-def set_tagline(dct, item):
-    header = item.xpath(
-        './/div[@class="TextModule"]'
-        '/div[@class="inner"]'
-        '/div[@class="copy"]'
-        '/h6')
-    if header:
-        dct['tagline'] = header[0].xpath('text()|*//text()')[0]
+    def get_date(self):
+        return dateutil.parser.parse(
+            self.blocks[1]
+            .xpath('*//text()')
+            [1]).date()
+
+    def set_tagline(self, dct):
+        header = self.item.xpath(
+            './/div[@class="TextModule"]'
+            '/div[@class="inner"]'
+            '/div[@class="copy"]'
+            '/h6')
+        if header:
+            dct['tagline'] = header[0].xpath('text()|*//text()')[0]
+
+    def set_links(self, dct):
+        if len(self.blocks) > 2:
+            dct['links'] = {
+                a.text: a.attrib['href']
+                for a in self.blocks[2].findall('a')
+            }
 
 
-def get_data_filters(item):
-    words = {
-        '1595': 'Music',
-        '2685': 'Arts & Activism'
-    }
-    items = item.xpath('..')[0].attrib['data-filters'].split()
-    return [words[k]
-            for k in items
-            if k in words]
-
-
-def get_article(item):
-    return ''.join(
-        lxml.etree.tostring(x).decode('utf-8')
-        for x in item.xpath(
-                '//div[contains(@class, "TextModule")]'
-                '|//div[contains(@class, "SpotifyModule")]'
-                '|//div[contains(@class, "MediaModule")]'))
+    def get_article(self):
+        return ''.join(
+            lxml.etree.tostring(x).decode('utf-8')
+            for x in self.item.xpath(
+                    '//div[contains(@class, "TextModule")]'
+                    '|//div[contains(@class, "SpotifyModule")]'
+                    '|//div[contains(@class, "MediaModule")]'))
 
 
 if __name__ == "__main__":
