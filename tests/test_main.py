@@ -36,7 +36,7 @@ def get_parsed(mocker):
                 'shambs-2019-04-15.html'),
             r'/acts/zusa/$': 'zusa-2019-04-16.html',
         }
-        default = 'bob-dylan-2019-04-13.html'
+        default = 'dummy_act.html'
         match = next((mappings[k] for k in mappings if re.search(k, url)),
                      default)
         return filename_here(match)
