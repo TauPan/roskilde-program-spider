@@ -183,6 +183,20 @@ class TestGetMain(object):
         _assert_zusa(data[ZUSAKEY])
 
 
+class TestGetParsed(object):
+
+    def test_returns_etree(self, mocker):
+        mocker.stopall()
+
+        class Response(object):
+            text = '<html><body><p>OK</p></body></html>'
+
+        mocker.patch('main.requests.Session.get',
+                     return_value=Response())
+        ret = main.get_parsed('http://foo')
+        assert ''.join(ret.xpath('//p//text()')) == 'OK'
+
+
 class TestBandlist(object):
 
     @pytest.fixture
