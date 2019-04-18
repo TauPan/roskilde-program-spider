@@ -6,10 +6,8 @@
 
 """
 
-import datetime
 import dateutil.parser
 import json
-import os
 import sys
 import urllib
 
@@ -65,17 +63,16 @@ class BandListItem(object):
     def __init__(self, item):
         self.item = item
 
-
     def parse(self):
         self.key, self.parsed_item = self.parse_main_item()
         HOSTURL = urllib.parse.urlunsplit(
-            (lambda u: (u[0], u[1], '', '', ''))(urllib.parse.urlsplit(BASEURL)))
+            (lambda u: (u[0], u[1], '', '', ''))
+            (urllib.parse.urlsplit(BASEURL)))
         page = parse_act_page(get_parsed(HOSTURL
                                          + '/'
                                          + self.parsed_item['link']))
         self.parsed_item.update(page)
         return self.key, self.parsed_item
-
 
     def parse_main_item(self):
         a = self.item.xpath('a')[0]
@@ -100,13 +97,15 @@ class BandListItem(object):
 def parse_act_page(item):
     return ActPage(item).parse()
 
+
 class ActPage(object):
 
     def __init__(self, item):
         self.item = item
 
     def parse(self):
-        self.blocks = self.item.xpath('.//div[@class="info"]/div[@class="block"]')
+        self.blocks = self.item.xpath(
+            './/div[@class="info"]/div[@class="block"]')
         ret = {
             'stage': self.blocks[0].xpath('text()')[0],
             'date': self.get_date()
@@ -115,7 +114,6 @@ class ActPage(object):
         self.set_links(ret)
         ret['article'] = self.get_article()
         return ret
-
 
     def get_date(self):
         return dateutil.parser.parse(
@@ -138,7 +136,6 @@ class ActPage(object):
                 a.text: a.attrib['href']
                 for a in self.blocks[2].findall('a')
             }
-
 
     def get_article(self):
         return ''.join(
