@@ -8,6 +8,8 @@ import re
 
 import main
 
+TEST_DIRECTORY = os.path.dirname(__file__)
+
 
 @pytest.fixture(autouse=True)
 def prevent_requests(mocker):
@@ -41,7 +43,7 @@ def get_parsed(mocker):
         }
         match = next((mappings[k] for k in mappings if re.search(k, url)),
                      default)
-        return '{}/{}'.format(os.path.dirname(__file__), match)
+        return '{}/{}'.format(TEST_DIRECTORY, match)
 
     mocker.patch('main.get_parsed', side_effect=_get)
 
@@ -84,14 +86,17 @@ def _assert_bob(bob):
             'will play Roskilde Festival 2019')
     assert bob['data-filters'] == ['Music']
 
+
 def _date_assert(dat, isostr):
     assert _date_iso(dat) == isostr
+
 
 def _date_iso(dat):
     if hasattr(dat, 'isoformat'):
         return dat.isoformat()
     else:
         return dat
+
 
 SHAMBSKEY = "SHAMBS X FARLI' X B WOOD$ X BRACY DOLL"
 
@@ -132,7 +137,7 @@ def _assert_zusa(zusa):
             'Website': 'http://zusastreet.dk/'
         },
         'article': _normalize_html(
-                open(os.path.dirname(__file__)
+                open(TEST_DIRECTORY
                      + '/zusa-2019-04-16-article.html', 'r').read())
     }
     assert comp == expected
@@ -173,7 +178,7 @@ class TestBandlist(object):
     @pytest.fixture
     def bandlist(self):
         return lxml.etree.fromstring(
-            open(os.path.dirname(__file__) + '/line-up-2019-04-13.html', 'r').read(),
+            open(TEST_DIRECTORY + '/line-up-2019-04-13.html', 'r').read(),
             lxml.etree.HTMLParser()
         )
 
@@ -226,16 +231,16 @@ class TestParseMainItem(WithBob):
         assert bob['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
         assert bob['country'] == 'US'
 
+
 class WithBobPage(WithBob):
     bobpage = lxml.etree.fromstring(
-        open(os.path.dirname(__file__) + '/bob-dylan-2019-04-13.html', 'r').read(),
+        open(TEST_DIRECTORY + '/bob-dylan-2019-04-13.html', 'r').read(),
         lxml.etree.HTMLParser()
     )
 
     @pytest.fixture
     def parsed_bob(self):
         return main.parse_act_page(self.bobpage)
-
 
 
 class TestParseActPage(WithBobPage):
