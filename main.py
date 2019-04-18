@@ -17,8 +17,6 @@ import lxml.etree
 import requests
 
 BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
-HOSTURL = urllib.parse.urlunsplit(
-    (lambda u: (u[0], u[1], '', '', ''))(urllib.parse.urlsplit(BASEURL)))
 
 
 def main(argv):
@@ -60,6 +58,8 @@ class session(object):
 
 
 def complete_item(item):
+    HOSTURL = urllib.parse.urlunsplit(
+        (lambda u: (u[0], u[1], '', '', ''))(urllib.parse.urlsplit(BASEURL)))
     key, parsed_item = parse_main_item(item)
     page = parse_act_page(get_parsed(HOSTURL + '/' + parsed_item['link']))
     parsed_item.update(page)
