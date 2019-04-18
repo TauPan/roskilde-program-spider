@@ -15,8 +15,8 @@ def prevent_requests(mocker):
 
 
 @pytest.fixture
-def get_parsed(mocker, request):
-    """Takes as parameters a dictionary of
+def get_parsed(mocker):
+    """Loads file from:
 
     - mappings: A dictionary of regexes mapped to content files to
       parse as html content. All files are searched underneath the
@@ -26,27 +26,24 @@ def get_parsed(mocker, request):
 
     """
     basedir = os.path.dirname(__file__)
-    default_default = 'bob-dylan-2019-04-13.html'
-    default_mappings = {
+    default = 'bob-dylan-2019-04-13.html'
+    mappings = {
         r'/line-up/$': 'line-up-2019-04-13.html',
         r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html',
         r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': 'shambs-2019-04-15.html',
         r'/acts/zusa/$': 'zusa-2019-04-16.html',
     }
-    config = getattr(request, 'param', {})
-    config.setdefault('default', default_default)
-    config.setdefault('mappings', default_mappings)
     def _get(url):
-        file = config['default']
-        for k in config['mappings']:
-            if re.search(k, url):
-                file = config['mappings'][k]
-                break
-        file = '{}/{}'.format(basedir, file)
         return lxml.etree.fromstring(
-            open(file, 'r').read(),
+            open(_file_match(url), 'r').read(),
             lxml.etree.HTMLParser()
         )
+
+    def _file_match(url):
+        match = next((mappings[k] for k in mappings if re.search(k, url)),
+                     default)
+        return '{}/{}'.format(basedir, match)
+
     mocker.patch('main.get_parsed', side_effect=_get)
 
 
