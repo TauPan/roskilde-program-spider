@@ -1,5 +1,4 @@
 import datetime
-import io
 import json
 import lxml.etree
 import os
@@ -37,7 +36,8 @@ def get_parsed(mocker):
         mappings = {
             r'/line-up/$': 'line-up-2019-04-13.html',
             r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html',
-            r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': 'shambs-2019-04-15.html',
+            r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': (
+                'shambs-2019-04-15.html'),
             r'/acts/zusa/$': 'zusa-2019-04-16.html',
         }
         default = 'bob-dylan-2019-04-13.html'
@@ -64,7 +64,8 @@ def _assert_bob(bob):
     }
     assert (
         links['Spotify']
-        == 'https://open.spotify.com/track/3AhXZa8sUQht0UEdBJgpGc?si=FIvHuowIQVWS-memeplwHA')
+        == ('https://open.spotify.com/track/'
+            '3AhXZa8sUQht0UEdBJgpGc?si=FIvHuowIQVWS-memeplwHA'))
     assert (
         links['Facebook']
         == 'https://www.facebook.com/bobdylan/')
@@ -105,13 +106,15 @@ def _assert_shambs(shambs):
     """Common assertions about "SHAMBS X FARLI' X B WOOD$ X BRACY DOLL"
     """
     assert shambs['stage'] == 'Countdown'
-    assert shambs['link'] == '/en/years/2019/acts/shambs-x-farli-x-b-wood-x-bracy-doll/'
+    assert shambs['link'] == ('/en/years/2019/acts/'
+                              'shambs-x-farli-x-b-wood-x-bracy-doll/')
     assert shambs['country'] == 'DK'
     assert 'links' not in shambs
     dat = shambs['date']
     _date_assert(dat, '2019-07-01')
     assert (shambs['tagline']
-            == 'Street trap rap with four sharp representatives. Expect chaos!')
+            == ('Street trap rap with four sharp '
+                'representatives. Expect chaos!'))
     assert shambs['data-filters'] == ['Music']
 
 
@@ -219,7 +222,7 @@ BOB DYLAN WITH HIS BAND
 </div>
 </a>
 </div>
-</div>'''
+</div>'''  # noqa
     bob = lxml.etree.fromstring(bobbase).xpath('div[@class="item-inner"]')[0]
 
 
