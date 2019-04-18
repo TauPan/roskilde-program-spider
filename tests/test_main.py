@@ -26,10 +26,7 @@ def get_parsed(mocker):
 
     """
     def _get(url):
-        return lxml.etree.fromstring(
-            open(_file_match(url), 'r').read(),
-            lxml.etree.HTMLParser()
-        )
+        return parse_file(_file_match(url))
 
     def _file_match(url):
         mappings = {
@@ -45,6 +42,13 @@ def get_parsed(mocker):
         return filename_here(match)
 
     mocker.patch('main.get_parsed', side_effect=_get)
+
+
+def parse_file(fil):
+    return lxml.etree.fromstring(
+        open(fil, 'r').read(),
+        lxml.etree.HTMLParser()
+    )
 
 
 def filename_here(fil):
@@ -183,10 +187,7 @@ class TestBandlist(object):
 
     @pytest.fixture
     def bandlist(self):
-        return lxml.etree.fromstring(
-            open(filename_here('/line-up-2019-04-13.html'), 'r').read(),
-            lxml.etree.HTMLParser()
-        )
+        return parse_file(filename_here('/line-up-2019-04-13.html'))
 
     @pytest.fixture
     def parsed_bandlist(self, bandlist, get_parsed):
@@ -239,10 +240,7 @@ class TestParseMainItem(WithBob):
 
 
 class WithBobPage(WithBob):
-    bobpage = lxml.etree.fromstring(
-        open(filename_here('/bob-dylan-2019-04-13.html'), 'r').read(),
-        lxml.etree.HTMLParser()
-    )
+    bobpage = parse_file(filename_here('/bob-dylan-2019-04-13.html'))
 
     @pytest.fixture
     def parsed_bob(self):
