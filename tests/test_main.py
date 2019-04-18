@@ -34,13 +34,13 @@ def get_parsed(mocker):
         )
 
     def _file_match(url):
-        default = 'bob-dylan-2019-04-13.html'
         mappings = {
             r'/line-up/$': 'line-up-2019-04-13.html',
             r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html',
             r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': 'shambs-2019-04-15.html',
             r'/acts/zusa/$': 'zusa-2019-04-16.html',
         }
+        default = 'bob-dylan-2019-04-13.html'
         match = next((mappings[k] for k in mappings if re.search(k, url)),
                      default)
         return '{}/{}'.format(TEST_DIRECTORY, match)
