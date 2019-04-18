@@ -7,8 +7,6 @@ import re
 
 import main
 
-TEST_DIRECTORY = os.path.dirname(__file__)
-
 
 @pytest.fixture(autouse=True)
 def prevent_requests(mocker):
@@ -44,9 +42,13 @@ def get_parsed(mocker):
         default = 'bob-dylan-2019-04-13.html'
         match = next((mappings[k] for k in mappings if re.search(k, url)),
                      default)
-        return '{}/{}'.format(TEST_DIRECTORY, match)
+        return filename_here(match)
 
     mocker.patch('main.get_parsed', side_effect=_get)
+
+
+def filename_here(fil):
+    return '{}/{}'.format(os.path.dirname(__file__), fil)
 
 
 BOBKEY = 'BOB DYLAN WITH HIS BAND'
@@ -141,8 +143,8 @@ def _assert_zusa(zusa):
             'Website': 'http://zusastreet.dk/'
         },
         'article': _normalize_html(
-                open(TEST_DIRECTORY
-                     + '/zusa-2019-04-16-article.html', 'r').read())
+                open(filename_here('/zusa-2019-04-16-article.html'),
+                     'r').read())
     }
     assert comp == expected
 
@@ -182,7 +184,7 @@ class TestBandlist(object):
     @pytest.fixture
     def bandlist(self):
         return lxml.etree.fromstring(
-            open(TEST_DIRECTORY + '/line-up-2019-04-13.html', 'r').read(),
+            open(filename_here('/line-up-2019-04-13.html'), 'r').read(),
             lxml.etree.HTMLParser()
         )
 
@@ -238,7 +240,7 @@ class TestParseMainItem(WithBob):
 
 class WithBobPage(WithBob):
     bobpage = lxml.etree.fromstring(
-        open(TEST_DIRECTORY + '/bob-dylan-2019-04-13.html', 'r').read(),
+        open(filename_here('/bob-dylan-2019-04-13.html'), 'r').read(),
         lxml.etree.HTMLParser()
     )
 
