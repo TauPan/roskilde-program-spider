@@ -17,13 +17,14 @@ def prevent_requests(mocker):
 
 @pytest.fixture
 def get_parsed(mocker):
-    """Loads file from:
+    """Patches main.get_parsed() to load a file from:
 
     - mappings: A dictionary of regexes mapped to content files to
-      parse as html content. All files are searched underneath the
-      directory this test file resides in.
+      parse as html content. All files are searched underneath
+      `TEST_DIRECTORY`, the directory this test file resides in.
 
-    - default: A filename for the default content if no mapping is found
+    - default: A filename for the default content if no mapping is
+      found.
 
     """
     def _get(url):
