@@ -164,9 +164,9 @@ class ActPage(object):
         return ''.join(
             lxml.etree.tostring(x).decode('utf-8')
             for x in self.item.xpath(
-                    '//div[contains(@class, "TextModule")]'
-                    '|//div[contains(@class, "SpotifyModule")]'
-                    '|//div[contains(@class, "MediaModule")]'))
+                '//div[contains(@class, "TextModule")]'
+                '|//div[contains(@class, "SpotifyModule")]'
+                '|//div[contains(@class, "MediaModule")]'))
 
 
 if __name__ == "__main__":

@@ -160,8 +160,8 @@ def _assert_zusa(zusa):
             'Website': 'http://zusastreet.dk/'
         },
         'article': _normalize_html(
-                open(filename_here('/zusa-2019-04-16-article.html'),
-                     'r').read())
+            open(filename_here('/zusa-2019-04-16-article.html'),
+                 'r').read())
     }
     assert comp == expected
 
