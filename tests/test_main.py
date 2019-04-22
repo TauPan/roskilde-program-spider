@@ -251,6 +251,7 @@ class TestParseMainItem(WithBob):
         assert item.key == BOBKEY
         assert item.link == '/en/years/2019/acts/bob-dylan-with-his-band/'
         assert item.country == 'US'
+        assert item.data_filters == ['Music']
 
 
 class WithBobPage(WithBob):
