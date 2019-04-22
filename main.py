@@ -65,7 +65,7 @@ class BandListItem(object):
             'link': self.link,
             'country': self.country,
             'data-filters': self.data_filters,
-            **self.page}
+            **self.parsed_act_page}
 
     @cached_property
     def a(self):
@@ -100,7 +100,7 @@ class BandListItem(object):
         (urllib.parse.urlsplit(BASEURL)))
 
     @cached_property
-    def page(self):
+    def parsed_act_page(self):
         return ActPage(
             get_parsed(self.HOSTURL
                        + '/'
