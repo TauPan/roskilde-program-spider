@@ -71,20 +71,20 @@ class BandListItem(object):
     def _a(self):
         return self.item.xpath('a')[0]
 
-    @cached_property
+    @property
     def key(self):
         return self._a.text.strip()
 
-    @cached_property
+    @property
     def link(self):
         return self._a.attrib['href']
 
-    @cached_property
+    @property
     def country(self):
         return self._a.xpath(
             'div[@class="item-meta"]/div[@class="country"]')[0].text
 
-    @cached_property
+    @property
     def data_filters(self):
         words = {
             '1595': 'Music',
@@ -99,7 +99,7 @@ class BandListItem(object):
         (lambda u: (u[0], u[1], '', '', ''))
         (urllib.parse.urlsplit(BASEURL)))
 
-    @cached_property
+    @property
     def parsed_act_page(self):
         return ActPage(
             get_parsed(self.HOSTURL
@@ -121,7 +121,7 @@ class ActPage(object):
             'article': self.article
         }
 
-    @cached_property
+    @property
     def stage(self):
         return self._blocks[0].xpath('text()')[0]
 
@@ -130,14 +130,14 @@ class ActPage(object):
         return self.item.xpath(
             './/div[@class="info"]/div[@class="block"]')
 
-    @cached_property
+    @property
     def date(self):
         return dateutil.parser.parse(
             self._blocks[1]
             .xpath('*//text()')
             [1]).date()
 
-    @cached_property
+    @property
     def tagline(self):
         header = self.item.xpath(
             './/div[@class="TextModule"]'
@@ -149,7 +149,7 @@ class ActPage(object):
         else:
             return None
 
-    @cached_property
+    @property
     def links(self):
         if len(self._blocks) > 2:
             return {
@@ -159,7 +159,7 @@ class ActPage(object):
         else:
             return []
 
-    @cached_property
+    @property
     def article(self):
         return ''.join(
             lxml.etree.tostring(x).decode('utf-8')
