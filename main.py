@@ -68,20 +68,20 @@ class BandListItem(object):
             **self.parsed_act_page}
 
     @cached_property
-    def a(self):
+    def _a(self):
         return self.item.xpath('a')[0]
 
     @cached_property
     def key(self):
-        return self.a.text.strip()
+        return self._a.text.strip()
 
     @cached_property
     def link(self):
-        return self.a.attrib['href']
+        return self._a.attrib['href']
 
     @cached_property
     def country(self):
-        return self.a.xpath(
+        return self._a.xpath(
             'div[@class="item-meta"]/div[@class="country"]')[0].text
 
     @cached_property
