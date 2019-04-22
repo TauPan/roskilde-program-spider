@@ -1,0 +1,12 @@
+dist: xenial
+language: python
+python:
+  - "3.7"
+# command to install dependencies
+install:
+  - pip install pipenv
+  - pipenv sync --dev
+# command to run tests
+script:
+  - export PYTHONPATH=.
+  - pytest
