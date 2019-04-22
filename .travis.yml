@@ -9,4 +9,6 @@ install:
 # command to run tests
 script:
   - export PYTHONPATH=.
-  - pytest
+  - pipenv run mypy
+  - pipenv run flake8
+  - pipenv run test

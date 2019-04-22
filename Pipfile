@@ -23,3 +23,8 @@ cached-property = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+test = "pytest"
+test_watch = "ptw --onpass 'notify-send --icon /usr/share/icons/default.kde4/base/128x128/actions/dialog-ok-apply.png tests passed' --onfail 'notify-send --icon /usr/share/icons/default.kde4/base/128x128/status/dialog-error.png tests failed' -- --testmon"
+mypy = "mypy main.py tests/test_main.py"
