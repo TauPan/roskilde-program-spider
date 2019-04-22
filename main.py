@@ -27,8 +27,8 @@ def main(argv):
 
 
 def get_data():
-    overview = get_parsed(BASEURL)
-    return bandlist(overview)
+    line_up_tree = get_parsed(BASEURL)
+    return bandlist(line_up_tree)
 
 
 def get_parsed(url):
@@ -37,9 +37,9 @@ def get_parsed(url):
         lxml.etree.HTMLParser())
 
 
-def bandlist(overview):
+def bandlist(line_up_tree):
     bands = dict(BandListItem(i).parse()
-                 for i in overview.xpath('.//div[@class="item-inner"]'))
+                 for i in line_up_tree.xpath('.//div[@class="item-inner"]'))
     return bands
 
 
