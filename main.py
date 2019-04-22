@@ -57,7 +57,7 @@ class session(object):
 
 
 class BandListItem(object):
-    def __init__(self, item):
+    def __init__(self, item: lxml.etree.ElementBase):
         self.item = item
 
     def parse(self):
