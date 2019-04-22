@@ -41,7 +41,6 @@ def get_parsed(url: str) -> List[lxml.etree._Element]:
 
 ActPageValType = Union[str,
                        datetime.date,
-                       None,
                        Dict[str, str]]
 
 
@@ -156,16 +155,13 @@ class ActPage(object):
             [1]).date()
 
     @property
-    def tagline(self) -> Union[str, None]:
+    def tagline(self) -> str:
         header = self.item.xpath(
             './/div[@class="TextModule"]'
             '/div[@class="inner"]'
             '/div[@class="copy"]'
             '/h6')
-        if header:
-            return header[0].xpath('text()|*//text()')[0]
-        else:
-            return None
+        return header[0].xpath('text()|*//text()')[0]
 
     @property
     def links(self) -> Dict[str, str]:
