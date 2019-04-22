@@ -12,6 +12,8 @@ pytest-watch = "*"
 jedi = "*"
 rope = "*"
 flake8 = "*"
+mypy = "*"
+flake8-mypy = "*"
 
 [packages]
 requests = "*"
