@@ -258,7 +258,7 @@ class WithBobPage(WithBob):
 
     @pytest.fixture
     def parsed_bob(self):
-        return main.parse_act_page(self.bobpage)
+        return main.ActPage(self.bobpage).parse()
 
 
 class TestParseActPage(WithBobPage):
@@ -270,9 +270,9 @@ class TestParseActPage(WithBobPage):
         assert parsed_bob['date'] == datetime.date(2019, 7, 3)
 
 
-class TestCompleteItem(WithBobPage):
+class TestBandListItem(WithBobPage):
 
     def test_complete_bob(self, mocker, get_parsed):
-        key, bob = main.complete_item(self.bob)
+        key, bob = main.BandListItem(self.bob).parse()
         assert key == BOBKEY
         _assert_bob(bob)

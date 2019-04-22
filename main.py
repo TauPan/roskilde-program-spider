@@ -38,7 +38,7 @@ def get_parsed(url):
 
 
 def bandlist(overview):
-    bands = dict(complete_item(i)
+    bands = dict(BandListItem(i).parse()
                  for i in overview.xpath('.//div[@class="item-inner"]'))
     return bands
 
@@ -56,10 +56,6 @@ class session(object):
         return session.SESSION.get(*args, **kwargs)
 
 
-def complete_item(item):
-    return BandListItem(item).parse()
-
-
 class BandListItem(object):
     def __init__(self, item):
         self.item = item
@@ -69,9 +65,10 @@ class BandListItem(object):
         HOSTURL = urllib.parse.urlunsplit(
             (lambda u: (u[0], u[1], '', '', ''))
             (urllib.parse.urlsplit(BASEURL)))
-        page = parse_act_page(get_parsed(HOSTURL
-                                         + '/'
-                                         + self.parsed_item['link']))
+        page = ActPage(
+            get_parsed(HOSTURL
+                       + '/'
+                       + self.parsed_item['link'])).parse()
         self.parsed_item.update(page)
         return self.key, self.parsed_item
 
@@ -93,10 +90,6 @@ class BandListItem(object):
         return [words[k]
                 for k in items
                 if k in words]
-
-
-def parse_act_page(item):
-    return ActPage(item).parse()
 
 
 class ActPage(object):
