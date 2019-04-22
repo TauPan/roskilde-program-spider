@@ -61,16 +61,9 @@ class BandListItem(object):
         self.item = item
 
     def parse(self):
-        self.parsed_item = dict(self.parsed_main_item)
-        HOSTURL = urllib.parse.urlunsplit(
-            (lambda u: (u[0], u[1], '', '', ''))
-            (urllib.parse.urlsplit(BASEURL)))
-        page = ActPage(
-            get_parsed(HOSTURL
-                       + '/'
-                       + self.link)).parse()
-        self.parsed_item.update(page)
-        return self.key, self.parsed_item
+        return self.key, dict(
+            self.parsed_main_item,
+            **self.page)
 
     @cached_property
     def a(self):
@@ -106,6 +99,16 @@ class BandListItem(object):
         return [words[k]
                 for k in items
                 if k in words]
+
+    @cached_property
+    def page(self):
+        HOSTURL = urllib.parse.urlunsplit(
+            (lambda u: (u[0], u[1], '', '', ''))
+            (urllib.parse.urlsplit(BASEURL)))
+        return ActPage(
+            get_parsed(HOSTURL
+                       + '/'
+                       + self.link)).parse()
 
 
 class ActPage(object):
