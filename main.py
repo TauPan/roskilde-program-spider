@@ -113,21 +113,23 @@ class ActPage(object):
         self.item = item
 
     def parse(self):
-        ret = {
-            'stage': self.blocks[0].xpath('text()')[0],
-            'date': self.get_date()
+        return {
+            key: getattr(self, key)
+            for key in ['stage', 'date', 'tagline', 'links', 'article']
+            if getattr(self, key) is not None
         }
-        self.set_tagline(ret)
-        self.set_links(ret)
-        ret['article'] = self.article
-        return ret
+
+    @cached_property
+    def stage(self):
+        return self.blocks[0].xpath('text()')[0]
 
     @cached_property
     def blocks(self):
         return self.item.xpath(
             './/div[@class="info"]/div[@class="block"]')
 
-    def get_date(self):
+    @cached_property
+    def date(self):
         return dateutil.parser.parse(
             self.blocks[1]
             .xpath('*//text()')
@@ -145,10 +147,6 @@ class ActPage(object):
         else:
             return None
 
-    def set_tagline(self, dct):
-        if self.tagline:
-            dct['tagline'] = self.tagline
-
     @cached_property
     def links(self):
         if len(self.blocks) > 2:
@@ -156,10 +154,6 @@ class ActPage(object):
                 a.text: a.attrib['href']
                 for a in self.blocks[2].findall('a')
             }
-
-    def set_links(self, dct):
-        if self.links:
-            dct['links'] = self.links
 
     @cached_property
     def article(self):
