@@ -95,13 +95,14 @@ class BandListItem(object):
                 for k in items
                 if k in words]
 
+    HOSTURL = urllib.parse.urlunsplit(
+        (lambda u: (u[0], u[1], '', '', ''))
+        (urllib.parse.urlsplit(BASEURL)))
+
     @cached_property
     def page(self):
-        HOSTURL = urllib.parse.urlunsplit(
-            (lambda u: (u[0], u[1], '', '', ''))
-            (urllib.parse.urlsplit(BASEURL)))
         return ActPage(
-            get_parsed(HOSTURL
+            get_parsed(self.HOSTURL
                        + '/'
                        + self.link)).parse()
 
