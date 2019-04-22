@@ -156,6 +156,8 @@ class ActPage(object):
                 a.text: a.attrib['href']
                 for a in self._blocks[2].findall('a')
             }
+        else:
+            return []
 
     @cached_property
     def article(self):
