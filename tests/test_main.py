@@ -1,8 +1,8 @@
 import datetime
 import json
-import lxml.etree
+import lxml.etree  # type: ignore
 import os
-import pytest
+import pytest  # type: ignore
 import re
 
 import main

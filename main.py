@@ -11,8 +11,8 @@ import json
 import sys
 import urllib.parse
 
-from cached_property import cached_property
-import lxml.etree
+from cached_property import cached_property  # type: ignore
+import lxml.etree  # type: ignore
 import requests
 
 BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
