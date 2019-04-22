@@ -61,27 +61,43 @@ class BandListItem(object):
         self.item = item
 
     def parse(self):
-        self.key, self.parsed_item = self.parse_main_item()
+        self.parsed_item = dict(self.parsed_main_item)
         HOSTURL = urllib.parse.urlunsplit(
             (lambda u: (u[0], u[1], '', '', ''))
             (urllib.parse.urlsplit(BASEURL)))
         page = ActPage(
             get_parsed(HOSTURL
                        + '/'
-                       + self.parsed_item['link'])).parse()
+                       + self.link)).parse()
         self.parsed_item.update(page)
         return self.key, self.parsed_item
 
-    def parse_main_item(self):
-        a = self.item.xpath('a')[0]
-        key = a.text.strip()
-        return key, {
-            'link': a.attrib['href'],
-            'country': a.xpath(
-                'div[@class="item-meta"]/div[@class="country"]')[0].text,
-            'data-filters': self.get_data_filters()}
+    @cached_property
+    def a(self):
+        return self.item.xpath('a')[0]
 
-    def get_data_filters(self):
+    @cached_property
+    def key(self):
+        return self.a.text.strip()
+
+    @cached_property
+    def link(self):
+        return self.a.attrib['href']
+
+    @cached_property
+    def country(self):
+        return self.a.xpath(
+            'div[@class="item-meta"]/div[@class="country"]')[0].text
+
+    @cached_property
+    def parsed_main_item(self):
+        return {
+            'link': self.link,
+            'country': self.country,
+            'data-filters': self.data_filters}
+
+    @cached_property
+    def data_filters(self):
         words = {
             '1595': 'Music',
             '2685': 'Arts & Activism'
