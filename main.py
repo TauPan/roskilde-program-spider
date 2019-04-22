@@ -39,7 +39,19 @@ def get_parsed(url: str) -> List[lxml.etree._Element]:
         lxml.etree.HTMLParser())
 
 
-def bandlist(line_up_tree: lxml.etree._Element) -> Dict[str, Dict[str, Any]]:
+ActPageValType = Union[str,
+                       datetime.date,
+                       None,
+                       Dict[str, str]]
+
+
+BandlistValType = Union[ActPageValType,
+                        List[str]]
+
+
+def bandlist(line_up_tree: lxml.etree._Element) -> Dict[str,
+                                                        Dict[str,
+                                                             BandlistValType]]:
     return dict(BandListItem(i).parse()
                 for i in line_up_tree.xpath('.//div[@class="item-inner"]'))
 
@@ -65,11 +77,8 @@ class BandListItem(object):
     def __init__(self, item: lxml.etree._Element) -> None:
         self.item = item
 
-    def parse(self) -> Tuple[str, Dict[str, Union[str,
-                                                  datetime.date,
-                                                  None,
-                                                  List[str],
-                                                  Dict[str, str]]]]:
+    def parse(self) -> Tuple[str,
+                             Dict[str, BandlistValType]]:
         return self.key, {
             'link': self.link,
             'country': self.country,
@@ -109,10 +118,7 @@ class BandListItem(object):
         (urllib.parse.urlsplit(BASEURL)))
 
     @property
-    def parsed_act_page(self) -> Dict[str, Union[str,
-                                                 datetime.date,
-                                                 None,
-                                                 Dict[str, str]]]:
+    def parsed_act_page(self) -> Dict[str, ActPageValType]:
         return ActPage(
             get_parsed(self.HOSTURL
                        + '/'
@@ -124,10 +130,7 @@ class ActPage(object):
     def __init__(self, item: lxml.etree._Element):
         self.item = item
 
-    def parse(self) -> Dict[str, Union[str,
-                                       datetime.date,
-                                       None,
-                                       Dict[str, str]]]:
+    def parse(self) -> Dict[str, ActPageValType]:
         return {
             'stage': self.stage,
             'date': self.date,
