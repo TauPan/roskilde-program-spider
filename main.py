@@ -53,7 +53,9 @@ class session(object):
             session.SESSION = requests.Session()
             self.__dict__.update(self.SESSION.__dict__)
 
-    def get(self, *args: Union[str, bytes], **kwargs: Union[str, bytes]) :
+    def get(self,
+            *args: Union[str, bytes],
+            **kwargs: Union[str, bytes]):
         assert session.SESSION is not None
         return session.SESSION.get(*args, **kwargs)
 
