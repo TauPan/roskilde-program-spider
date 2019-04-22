@@ -115,8 +115,10 @@ class ActPage(object):
 
     @property
     def blocks(self):
-        return self.item.xpath(
+        if not hasattr(self, '_blocks'):
+            self._blocks = self.item.xpath(
             './/div[@class="info"]/div[@class="block"]')
+        return self._blocks
 
     def get_date(self):
         return dateutil.parser.parse(
