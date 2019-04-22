@@ -121,17 +121,17 @@ class ActPage(object):
 
     @cached_property
     def stage(self):
-        return self.blocks[0].xpath('text()')[0]
+        return self._blocks[0].xpath('text()')[0]
 
     @cached_property
-    def blocks(self):
+    def _blocks(self):
         return self.item.xpath(
             './/div[@class="info"]/div[@class="block"]')
 
     @cached_property
     def date(self):
         return dateutil.parser.parse(
-            self.blocks[1]
+            self._blocks[1]
             .xpath('*//text()')
             [1]).date()
 
@@ -149,10 +149,10 @@ class ActPage(object):
 
     @cached_property
     def links(self):
-        if len(self.blocks) > 2:
+        if len(self._blocks) > 2:
             return {
                 a.text: a.attrib['href']
-                for a in self.blocks[2].findall('a')
+                for a in self._blocks[2].findall('a')
             }
 
     @cached_property
