@@ -119,7 +119,7 @@ class ActPage(object):
         }
         self.set_tagline(ret)
         self.set_links(ret)
-        ret['article'] = self.get_article()
+        ret['article'] = self.article
         return ret
 
     @cached_property
@@ -133,23 +133,36 @@ class ActPage(object):
             .xpath('*//text()')
             [1]).date()
 
-    def set_tagline(self, dct):
+    @cached_property
+    def tagline(self):
         header = self.item.xpath(
             './/div[@class="TextModule"]'
             '/div[@class="inner"]'
             '/div[@class="copy"]'
             '/h6')
         if header:
-            dct['tagline'] = header[0].xpath('text()|*//text()')[0]
+            return header[0].xpath('text()|*//text()')[0]
+        else:
+            return None
 
-    def set_links(self, dct):
+    def set_tagline(self, dct):
+        if self.tagline:
+            dct['tagline'] = self.tagline
+
+    @cached_property
+    def links(self):
         if len(self.blocks) > 2:
-            dct['links'] = {
+            return {
                 a.text: a.attrib['href']
                 for a in self.blocks[2].findall('a')
             }
 
-    def get_article(self):
+    def set_links(self, dct):
+        if self.links:
+            dct['links'] = self.links
+
+    @cached_property
+    def article(self):
         return ''.join(
             lxml.etree.tostring(x).decode('utf-8')
             for x in self.item.xpath(
