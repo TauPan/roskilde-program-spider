@@ -55,7 +55,7 @@ class session(object):
 
     def get(self,
             *args: Union[str, bytes],
-            **kwargs: Union[str, bytes]):
+            **kwargs: Union[str, bytes]) -> requests.Response:
         assert session.SESSION is not None
         return session.SESSION.get(*args, **kwargs)
 
