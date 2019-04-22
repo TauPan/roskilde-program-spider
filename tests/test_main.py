@@ -129,7 +129,7 @@ def _assert_shambs(shambs):
     assert shambs['link'] == ('/en/years/2019/acts/'
                               'shambs-x-farli-x-b-wood-x-bracy-doll/')
     assert shambs['country'] == 'DK'
-    assert 'links' not in shambs
+    assert shambs['links'] is None
     dat = shambs['date']
     _date_assert(dat, '2019-07-01')
     assert (shambs['tagline']
