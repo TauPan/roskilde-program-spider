@@ -104,8 +104,6 @@ class ActPage(object):
         self.item = item
 
     def parse(self):
-        self.blocks = self.item.xpath(
-            './/div[@class="info"]/div[@class="block"]')
         ret = {
             'stage': self.blocks[0].xpath('text()')[0],
             'date': self.get_date()
@@ -114,6 +112,11 @@ class ActPage(object):
         self.set_links(ret)
         ret['article'] = self.get_article()
         return ret
+
+    @property
+    def blocks(self):
+        return self.item.xpath(
+            './/div[@class="info"]/div[@class="block"]')
 
     def get_date(self):
         return dateutil.parser.parse(
