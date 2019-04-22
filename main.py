@@ -11,6 +11,7 @@ import json
 import sys
 import urllib
 
+from cached_property import cached_property
 import lxml.etree
 import requests
 
@@ -113,12 +114,10 @@ class ActPage(object):
         ret['article'] = self.get_article()
         return ret
 
-    @property
+    @cached_property
     def blocks(self):
-        if not hasattr(self, '_blocks'):
-            self._blocks = self.item.xpath(
+        return self.item.xpath(
             './/div[@class="info"]/div[@class="block"]')
-        return self._blocks
 
     def get_date(self):
         return dateutil.parser.parse(

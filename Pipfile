@@ -17,6 +17,7 @@ flake8 = "*"
 requests = "*"
 lxml = "*"
 python-dateutil = "*"
+cached-property = "*"
 
 [requires]
 python_version = "3.7"
