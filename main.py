@@ -114,10 +114,14 @@ class ActPage(object):
 
     def parse(self):
         return {
-            key: getattr(self, key)
-            for key in ['stage', 'date', 'tagline', 'links', 'article']
-            if getattr(self, key) is not None
-        }
+            'stage': self.stage,
+            'date': self.date,
+            'tagline': self.tagline,
+            **{
+                key: getattr(self, key)
+                for key in ['links', 'article']
+                if getattr(self, key) is not None
+            }}
 
     @cached_property
     def stage(self):
