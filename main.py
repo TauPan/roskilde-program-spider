@@ -61,7 +61,7 @@ class session(object):
     SESSION = None
 
     def __init__(self) -> None:
-        if session.SESSION is None:
+        if session.SESSION is None:  # pragma: nobranch
             session.SESSION = requests.Session()
             self.__dict__.update(self.SESSION.__dict__)
 
@@ -187,5 +187,5 @@ class ActPage(object):
                 '|//div[contains(@class, "MediaModule")]'))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: nocover
     sys.exit(main(sys.argv))
