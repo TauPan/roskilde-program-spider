@@ -117,11 +117,9 @@ class ActPage(object):
             'stage': self.stage,
             'date': self.date,
             'tagline': self.tagline,
-            **{
-                key: getattr(self, key)
-                for key in ['links', 'article']
-                if getattr(self, key) is not None
-            }}
+            'links': self.links,
+            'article': self.article
+        }
 
     @cached_property
     def stage(self):
