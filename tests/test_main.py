@@ -172,10 +172,10 @@ def _normalize_html(s):
                               lxml.etree.HTMLParser())).decode('utf-8')
 
 
-class TestGetMain(object):
+class TestGetData(object):
 
     def test_returns_data(self, get_parsed):
-        data = main.get_main()
+        data = main.get_data()
         assert data
         bob = data[BOBKEY]
         _assert_bob(bob)

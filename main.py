@@ -19,14 +19,14 @@ BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
 
 
 def main(argv):
-    ret = json.dumps(get_main(),
+    ret = json.dumps(get_data(),
                      default=lambda x: x.isoformat(),
                      indent=2)
     print(ret)
     return ret
 
 
-def get_main():
+def get_data():
     overview = get_parsed(BASEURL)
     return bandlist(overview)
 
