@@ -7,9 +7,11 @@
 """
 
 import dateutil.parser
+import datetime
 import json
 import sys
 import urllib.parse
+from typing import (Any, Dict, List, Tuple, Union)
 
 from cached_property import cached_property  # type: ignore
 import lxml.etree  # type: ignore
@@ -18,7 +20,7 @@ import requests
 BASEURL = "https://www.roskilde-festival.dk/en/line-up/"
 
 
-def main(argv):
+def main(argv: List[str]) -> str:
     ret = json.dumps(get_data(),
                      default=lambda x: x.isoformat(),
                      indent=2)
@@ -26,41 +28,46 @@ def main(argv):
     return ret
 
 
-def get_data():
+def get_data() -> Dict[str, Dict[str, Any]]:
     line_up_tree = get_parsed(BASEURL)
     return bandlist(line_up_tree)
 
 
-def get_parsed(url):
+def get_parsed(url: str) -> List[lxml.etree._Element]:
     return lxml.etree.fromstring(
         session().get(url).text,
         lxml.etree.HTMLParser())
 
 
-def bandlist(line_up_tree):
-    bands = dict(BandListItem(i).parse()
-                 for i in line_up_tree.xpath('.//div[@class="item-inner"]'))
-    return bands
+def bandlist(line_up_tree: lxml.etree._Element) -> Dict[str, Dict[str, Any]]:
+    return dict(BandListItem(i).parse()
+                for i in line_up_tree.xpath('.//div[@class="item-inner"]'))
 
 
 class session(object):
 
     SESSION = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self) -> None:
         if session.SESSION is None:
-            session.SESSION = requests.Session(*args, **kwargs)
+            session.SESSION = requests.Session()
             self.__dict__.update(self.SESSION.__dict__)
 
-    def get(self, *args, **kwargs):
+    def get(self, *args: Union[str, bytes], **kwargs: Union[str, bytes]) :
+        assert session.SESSION is not None
         return session.SESSION.get(*args, **kwargs)
 
 
 class BandListItem(object):
-    def __init__(self, item: lxml.etree.ElementBase):
+
+    def __init__(self, item: lxml.etree._Element) -> None:
         self.item = item
 
-    def parse(self):
+    def parse(self) -> Tuple[str, Dict[str, Union[str,
+                                                  datetime.date,
+                                                  None,
+                                                  List[str],
+                                                  Dict[str, str]]]]:
         return self.key, {
             'link': self.link,
             'country': self.country,
@@ -68,24 +75,24 @@ class BandListItem(object):
             **self.parsed_act_page}
 
     @cached_property
-    def _a(self):
+    def _a(self) -> lxml.etree._Element:
         return self.item.xpath('a')[0]
 
     @property
-    def key(self):
+    def key(self) -> str:
         return self._a.text.strip()
 
     @property
-    def link(self):
+    def link(self) -> str:
         return self._a.attrib['href']
 
     @property
-    def country(self):
+    def country(self) -> str:
         return self._a.xpath(
             'div[@class="item-meta"]/div[@class="country"]')[0].text
 
     @property
-    def data_filters(self):
+    def data_filters(self) -> List[str]:
         words = {
             '1595': 'Music',
             '2685': 'Arts & Activism'
@@ -95,12 +102,15 @@ class BandListItem(object):
                 for k in items
                 if k in words]
 
-    HOSTURL = urllib.parse.urlunsplit(
+    HOSTURL: str = urllib.parse.urlunsplit(
         (lambda u: (u[0], u[1], '', '', ''))
         (urllib.parse.urlsplit(BASEURL)))
 
     @property
-    def parsed_act_page(self):
+    def parsed_act_page(self) -> Dict[str, Union[str,
+                                                 datetime.date,
+                                                 None,
+                                                 Dict[str, str]]]:
         return ActPage(
             get_parsed(self.HOSTURL
                        + '/'
@@ -109,10 +119,13 @@ class BandListItem(object):
 
 class ActPage(object):
 
-    def __init__(self, item):
+    def __init__(self, item: lxml.etree._Element):
         self.item = item
 
-    def parse(self):
+    def parse(self) -> Dict[str, Union[str,
+                                       datetime.date,
+                                       None,
+                                       Dict[str, str]]]:
         return {
             'stage': self.stage,
             'date': self.date,
@@ -122,23 +135,23 @@ class ActPage(object):
         }
 
     @property
-    def stage(self):
+    def stage(self) -> str:
         return self._blocks[0].xpath('text()')[0]
 
     @cached_property
-    def _blocks(self):
+    def _blocks(self) -> List[lxml.etree._Element]:
         return self.item.xpath(
             './/div[@class="info"]/div[@class="block"]')
 
     @property
-    def date(self):
+    def date(self) -> datetime.date:
         return dateutil.parser.parse(
             self._blocks[1]
             .xpath('*//text()')
             [1]).date()
 
     @property
-    def tagline(self):
+    def tagline(self) -> Union[str, None]:
         header = self.item.xpath(
             './/div[@class="TextModule"]'
             '/div[@class="inner"]'
@@ -150,17 +163,17 @@ class ActPage(object):
             return None
 
     @property
-    def links(self):
+    def links(self) -> Dict[str, str]:
         if len(self._blocks) > 2:
             return {
                 a.text: a.attrib['href']
                 for a in self._blocks[2].findall('a')
             }
         else:
-            return []
+            return {}
 
     @property
-    def article(self):
+    def article(self) -> str:
         return ''.join(
             lxml.etree.tostring(x).decode('utf-8')
             for x in self.item.xpath(
