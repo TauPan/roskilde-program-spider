@@ -61,9 +61,11 @@ class BandListItem(object):
         self.item = item
 
     def parse(self):
-        return self.key, dict(
-            self.parsed_main_item,
-            **self.page)
+        return self.key, {
+            'link': self.link,
+            'country': self.country,
+            'data-filters': self.data_filters,
+            **self.page}
 
     @cached_property
     def a(self):
@@ -81,13 +83,6 @@ class BandListItem(object):
     def country(self):
         return self.a.xpath(
             'div[@class="item-meta"]/div[@class="country"]')[0].text
-
-    @cached_property
-    def parsed_main_item(self):
-        return {
-            'link': self.link,
-            'country': self.country,
-            'data-filters': self.data_filters}
 
     @cached_property
     def data_filters(self):

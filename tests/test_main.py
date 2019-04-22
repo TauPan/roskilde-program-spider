@@ -246,12 +246,11 @@ BOB DYLAN WITH HIS BAND
 
 class TestParseMainItem(WithBob):
 
-    def test_has_key(self):
+    def test_has_properties(self):
         item = main.BandListItem(self.bob)
-        bob = main.BandListItem(self.bob).parsed_main_item
         assert item.key == BOBKEY
-        assert bob['link'] == '/en/years/2019/acts/bob-dylan-with-his-band/'
-        assert bob['country'] == 'US'
+        assert item.link == '/en/years/2019/acts/bob-dylan-with-his-band/'
+        assert item.country == 'US'
 
 
 class WithBobPage(WithBob):
