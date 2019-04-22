@@ -26,7 +26,7 @@ python_version = "3.7"
 
 [scripts]
 test = "pytest"
-test_watch = "ptw --onpass 'pipenv run _tests_passed tests passed' --onfail 'pipenv run _test_failed tests failed' -- --testmon"
+test_watch = "ptw --onpass 'pipenv run _tests_passed tests passed' --onfail 'pipenv run _tests_failed tests failed' -- --testmon"
 mypy = "mypy main.py tests/test_main.py"
 mypy_watch = "ptw --onpass 'pipenv run _tests_passed mypy passed' --onfail 'pipenv run _tests_failed mypy failed' --runner 'pipenv run mypy'"
 _tests_passed = "bash -c '${PASS_COMMAND:-notify-send --icon $(pipenv run _pass_icon)} -- $0 \"$*\"'"
