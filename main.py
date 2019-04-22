@@ -9,7 +9,7 @@
 import dateutil.parser
 import json
 import sys
-import urllib
+import urllib.parse
 
 from cached_property import cached_property
 import lxml.etree
