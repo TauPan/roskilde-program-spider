@@ -200,7 +200,7 @@ class TestBandlist(object):
 
     @pytest.fixture
     def bandlist(self):
-        return parse_file(filename_here('/line-up-2019-04-13.html'))
+        return parse_file(filename_here('/line-up-2019-04-30.html'))
 
     @pytest.fixture
     def parsed_bandlist(self, bandlist, get_parsed):
