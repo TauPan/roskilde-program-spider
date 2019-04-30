@@ -267,7 +267,7 @@ class TestParseActPage(WithBobPage):
         assert parsed_bob['stage'] == 'Orange'
 
     def test_has_date(self, parsed_bob):
-        assert parsed_bob['date'] == datetime.date(2019, 7, 3)
+        assert parsed_bob['date'] == datetime.datetime(2019, 7, 3, 20, 0)
 
 
 class TestBandListItem(WithBobPage):
