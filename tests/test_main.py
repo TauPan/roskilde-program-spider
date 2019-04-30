@@ -30,11 +30,11 @@ def get_parsed(mocker):
 
     def _file_match(url):
         mappings = {
-            r'/line-up/$': 'line-up-2019-04-13.html',
-            r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-13.html',
+            r'/line-up/$': 'line-up-2019-04-30.html',
+            r'/acts/bob-dylan-with-his-band/$': 'bob-dylan-2019-04-30.html',
             r'/acts/shambs-x-farli-x-b-wood-x-bracy-doll/$': (
-                'shambs-2019-04-15.html'),
-            r'/acts/zusa/$': 'zusa-2019-04-16.html',
+                'shambs-2019-04-30.html'),
+            r'/acts/zusa/$': 'zusa-2019-04-30.html',
         }
         default = 'dummy_act.html'
         match = next((mappings[k] for k in mappings if re.search(k, url)),
@@ -254,7 +254,7 @@ class TestParseMainItem(WithBob):
 
 
 class WithBobPage(WithBob):
-    bobpage = parse_file(filename_here('/bob-dylan-2019-04-13.html'))
+    bobpage = parse_file(filename_here('/bob-dylan-2019-04-30.html'))
 
     @pytest.fixture
     def parsed_bob(self):
