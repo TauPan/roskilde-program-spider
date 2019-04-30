@@ -101,7 +101,7 @@ def _assert_bob(bob):
     assert (
         links['Website']
         == 'https://www.bobdylan.com/')
-    _date_assert(bob['date'], '2019-07-03')
+    _date_assert(bob['date'], '2019-07-03T20:00:00')
     assert (bob['tagline']
             == 'The iconic singer-songwriter, who changed the world, '
             'will play Roskilde Festival 2019')
@@ -131,7 +131,7 @@ def _assert_shambs(shambs):
     assert shambs['country'] == 'DK'
     assert shambs['links'] == {}
     dat = shambs['date']
-    _date_assert(dat, '2019-07-01')
+    _date_assert(dat, '2019-07-01T23:00:00')
     assert (shambs['tagline']
             == ('Street trap rap with four sharp '
                 'representatives. Expect chaos!'))
@@ -149,7 +149,7 @@ def _assert_zusa(zusa):
     comp['article'] = _normalize_html(comp['article'])
     expected = {
         'stage': 'Art Zone',
-        'date': '2019-07-03',
+        'date': '2019-07-03T00:00:00',
         'tagline': 'Meet up at ZUSA and become part of the community',
         'country': 'DK',
         'link': '/en/years/2019/acts/zusa/',
