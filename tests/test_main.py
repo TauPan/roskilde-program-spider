@@ -130,8 +130,7 @@ def _assert_shambs(shambs):
                               'shambs-x-farli-x-b-wood-x-bracy-doll/')
     assert shambs['country'] == 'DK'
     assert shambs['links'] == {}
-    dat = shambs['date']
-    _date_assert(dat, '2019-07-01T23:00:00')
+    _date_assert(shambs['date'], '2019-07-01T23:00:00')
     assert (shambs['tagline']
             == ('Street trap rap with four sharp '
                 'representatives. Expect chaos!'))
