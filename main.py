@@ -148,11 +148,11 @@ class ActPage(object):
             './/div[@class="info"]/div[@class="block"]')
 
     @property
-    def date(self) -> datetime.date:
+    def date(self) -> datetime.datetime:
         return dateutil.parser.parse(
-            self._blocks[1]
-            .xpath('*//text()')
-            [1]).date()
+            ' '.join(self._blocks[1]
+                     .xpath('*//text()')
+                     [1:]))
 
     @property
     def tagline(self) -> str:
